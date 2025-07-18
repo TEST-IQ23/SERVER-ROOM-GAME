@@ -2,112 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Server Room Lockdown - Start</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Server Room Lockdown</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(#0d1117, #161b22);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    h1 {
-      font-size: 2rem;
-      color: #58a6ff;
-      margin-bottom: 10px;
-    }
-
-    input[type="text"] {
-      padding: 10px;
-      border-radius: 4px;
-      border: none;
-      font-size: 1rem;
-      width: 100%;
-      max-width: 300px;
-      margin-bottom: 20px;
-    }
-
-    .btn {
-      background-color: #28a745;
-      color: white;
-      padding: 10px 20px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-bottom: 30px;
-    }
-
-    .chapter-list {
-      display: none;
-      max-width: 600px;
-      width: 100%;
-    }
-
-    .chapter-item {
-      background: #21262d;
-      margin: 10px 0;
-      padding: 15px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .chapter-item:hover {
-      background: #30363d;
-    }
-  </style>
 </head>
 <body>
-
-  <h1>🔐 Server Room Lockdown</h1>
-  <p>Agent, enter your name to begin the mission:</p>
-  <input type="text" id="playerName" placeholder="Enter your name" />
-  <button class="btn" onclick="startMission()">Start Mission</button>
-
-  <div class="chapter-list" id="chapterList">
-    <h2>Available Missions</h2>
-    <div id="chapters"></div>
+  <div class="container">
+    <h1>🔒 Server Room Lockdown</h1>
+    <p>A cyber breach has sealed the server room. Can you solve all security challenges to escape?</p>
+    <button onclick="startGame()">🚀 Start Mission</button>
   </div>
 
-  <script type="module">
-    import chapters from './chapters.js';
-
-    const chapterList = document.getElementById("chapterList");
-    const chaptersDiv = document.getElementById("chapters");
-
-    function startMission() {
-      const name = document.getElementById("playerName").value.trim();
-      if (!name) {
-        alert("Please enter your name to continue.");
-        return;
-      }
-
-      localStorage.setItem("playerName", name);
-      chapterList.style.display = "block";
-      renderChapters();
-    }
-
-    function renderChapters() {
-      Object.keys(chapters).forEach(chapterId => {
-        const chapter = chapters[chapterId];
-        const div = document.createElement("div");
-        div.className = "chapter-item";
-        div.innerHTML = `<strong>Chapter ${chapterId}</strong>: ${chapter.title}`;
-        div.onclick = () => {
-          window.location.href = `chapters.html?chapter=${chapterId}`;
-        };
-        chaptersDiv.appendChild(div);
-      });
+  <script>
+    function startGame() {
+      window.location.href = 'chapter.html';
     }
   </script>
-
 </body>
 </html>
