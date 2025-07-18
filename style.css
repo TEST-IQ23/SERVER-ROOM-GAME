@@ -1,0 +1,82 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  margin: 0;
+  background: #101820;
+  color: #fff;
+}
+
+#game-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+}
+
+#player-info-form input {
+  margin: 5px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #00aaff;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: gray;
+}
+
+.hidden {
+  display: none;
+}
+
+#progress-bar {
+  height: 10px;
+  background: #333;
+  margin: 20px 0;
+}
+
+#progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #00ff88;
+  transition: width 0.4s ease-in-out;
+}
+
+#question-container {
+  margin: 20px 0;
+}
+
+.option-button {
+  display: block;
+  margin: 8px 0;
+  padding: 10px;
+  background: #222;
+  border: 1px solid #00aaff;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.option-button.correct {
+  background: green;
+}
+
+.option-button.wrong {
+  background: red;
+}
+
+@media (max-width: 600px) {
+  #player-info-form input, button {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
