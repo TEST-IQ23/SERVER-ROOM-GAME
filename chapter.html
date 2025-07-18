@@ -2,80 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Server Room Lockdown - Chapter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Server Room Lockdown – Chapters</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="chapters.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <div class="container">
-    <h1 id="chapter-title">Loading Chapter...</h1>
-    <div id="question-container"></div>
-    <button id="submitBtn" class="btn" style="display:none;">Submit Answers</button>
-    <div id="result-container"></div>
-  </div>
+  <header>
+    <h1>🧠 Welcome, <span id="playerName">Agent</span></h1>
+    <p>Select a chapter to begin your mission.</p>
+  </header>
 
-  <script type="module">
-    import chapters from './chapters.js';
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const chapterId = urlParams.get('chapter');
-
-    const chapterTitle = document.getElementById('chapter-title');
-    const questionContainer = document.getElementById('question-container');
-    const submitBtn = document.getElementById('submitBtn');
-    const resultContainer = document.getElementById('result-container');
-
-    if (!chapterId || !chapters[chapterId]) {
-      chapterTitle.innerText = "Chapter not found.";
-    } else {
-      const chapter = chapters[chapterId];
-      chapterTitle.innerText = `Chapter ${chapterId}: ${chapter.title}`;
-
-      chapter.questions.forEach((question, index) => {
-        const block = document.createElement('div');
-        block.className = 'question-block';
-
-        const questionEl = document.createElement('p');
-        questionEl.innerText = `${index + 1}. ${question.question}`;
-        block.appendChild(questionEl);
-
-        if (question.type === 'MCQ') {
-          question.options.forEach(option => {
-            const label = document.createElement('label');
-            const input = document.createElement('input');
-            input.type = 'radio';
-            input.name = `q${index}`;
-            input.value = option;
-            label.appendChild(input);
-            label.append(` ${option}`);
-            block.appendChild(label);
-            block.appendChild(document.createElement('br'));
-          });
-        } else if (question.type === 'text') {
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.name = `q${index}`;
-          input.placeholder = 'Your answer...';
-          block.appendChild(input);
-        }
-
-        questionContainer.appendChild(block);
-      });
-
-      submitBtn.style.display = 'block';
-    }
-
-    submitBtn.addEventListener('click', () => {
-      let score = 0;
-      const chapter = chapters[chapterId];
-      chapter.questions.forEach((q, i) => {
-        const input = document.querySelector(`[name="q${i}"]:checked`) || document.querySelector(`[name="q${i}"]`);
-        if (input && input.value.trim().toLowerCase() === q.answer.trim().toLowerCase()) {
-          score++;
-        }
-      });
-      resultContainer.innerHTML = `<p>You scored ${score} out of ${chapter.questions.length}.</p>`;
-    });
-  </script>
+  <main id="chaptersList">
+    <!-- Chapters will be loaded here by script.js -->
+  </main>
 </body>
 </html>
