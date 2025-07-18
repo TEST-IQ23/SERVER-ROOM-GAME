@@ -5,6 +5,7 @@ body {
   margin: 0;
   padding: 0;
 }
+
 .container {
   max-width: 700px;
   margin: auto;
@@ -14,13 +15,16 @@ body {
   box-shadow: 0 0 25px #58a6ff88;
   animation: fadeIn 1s ease-in-out;
 }
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
 h1, h2 {
   color: #58a6ff;
 }
+
 input[type="text"] {
   width: 100%;
   padding: 0.75rem;
@@ -31,6 +35,7 @@ input[type="text"] {
   background-color: #0d1117;
   color: #fff;
 }
+
 button {
   background: #238636;
   color: white;
@@ -39,17 +44,21 @@ button {
   border-radius: 0.5rem;
   font-size: 1rem;
   cursor: pointer;
-  margin-top: 1rem;
+  margin: 0.5rem 0;
 }
+
 button:hover {
   background-color: #2ea043;
 }
+
 .hidden {
   display: none;
 }
+
 .success {
   color: #3fb950;
 }
+
 #certificate {
   margin-top: 2rem;
   background: #0d1117;
@@ -58,32 +67,24 @@ button:hover {
   border-radius: 1rem;
   text-align: center;
 }
+
 #timer {
   float: right;
   font-weight: bold;
   color: #f0f6fc;
 }
+
+.chapter-button {
+  background: #8250df;
+  display: block;
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
 .narrative {
   background-color: #21262d;
   padding: 1rem;
   border-radius: 0.5rem;
   margin: 1rem 0;
   font-style: italic;
-}
-.chapter-selection {
-  margin-top: 2rem;
-}
-#progressBarContainer {
-  background: #30363d;
-  height: 10px;
-  width: 100%;
-  border-radius: 5px;
-  margin-bottom: 1rem;
-}
-#progressBar {
-  background: #58a6ff;
-  height: 10px;
-  width: 0%;
-  border-radius: 5px;
-  transition: width 0.5s ease;
 }
