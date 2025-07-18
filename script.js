@@ -1,5 +1,10 @@
 let startTime = Date.now();
-let completedChapters = 0;
+
+const introScreen = document.getElementById("intro-screen");
+const chapterView = document.getElementById("chapter-view");
+const chapterTitle = document.getElementById("chapterTitle");
+const questionsContainer = document.getElementById("questionsContainer");
+const chapterList = document.getElementById("chapter-list");
 
 function updateTimer() {
   const now = Date.now();
@@ -10,60 +15,45 @@ function updateTimer() {
 }
 setInterval(updateTimer, 1000);
 
-const container = document.getElementById('game-container');
+chapters.forEach((chapter, index) => {
+  const btn = document.createElement('button');
+  btn.innerText = `Chapter ${index + 1}: ${chapter.title}`;
+  btn.className = 'chapter-button';
+  btn.onclick = () => loadChapter(index);
+  chapterList.appendChild(btn);
+});
 
-function updateProgress() {
-  const percent = Math.floor((completedChapters / chapters.length) * 100);
-  document.getElementById("progressBar").style.width = percent + "%";
-}
+function loadChapter(index) {
+  introScreen.classList.add("hidden");
+  chapterView.classList.remove("hidden");
+  chapterTitle.innerText = `Chapter ${index + 1}: ${chapters[index].title}`;
+  questionsContainer.innerHTML = "";
 
-function renderChapter(chapter, index) {
-  const chapterDiv = document.createElement('div');
-  chapterDiv.className = 'chapter';
-  chapterDiv.innerHTML = `<h2>${chapter.title}</h2>`;
-  let correctAnswers = 0;
-
-  chapter.questions.forEach((question, qIndex) => {
-    const questionDiv = document.createElement('div');
-    questionDiv.className = 'question';
-    questionDiv.innerHTML = `<p><strong>Q${qIndex + 1}:</strong> ${question.q}</p>`;
+  chapters[index].questions.forEach((question, qIndex) => {
+    const div = document.createElement('div');
+    div.innerHTML = `<p><strong>Q${qIndex + 1}:</strong> ${question.q}</p>`;
 
     question.options.forEach(option => {
       const btn = document.createElement('button');
-      btn.textContent = option;
+      btn.innerText = option;
       btn.onclick = () => {
-        if (btn.disabled) return;
-
         if (option === question.answer) {
-          btn.style.background = '#238636';
-          correctAnswers++;
+          alert("✅ Correct!");
         } else {
-          btn.style.background = '#da3633';
-        }
-
-        Array.from(questionDiv.querySelectorAll("button")).forEach(b => b.disabled = true);
-
-        if (correctAnswers === chapter.questions.length) {
-          completedChapters++;
-          updateProgress();
-          if (completedChapters === chapters.length) {
-            document.getElementById('success').classList.remove('hidden');
-          }
+          alert("❌ Wrong answer!");
         }
       };
-      questionDiv.appendChild(btn);
+      div.appendChild(btn);
     });
 
-    chapterDiv.appendChild(questionDiv);
+    questionsContainer.appendChild(div);
   });
-
-  container.appendChild(chapterDiv);
 }
 
-chapters.forEach((chapter, i) => {
-  renderChapter(chapter, i);
-});
-updateProgress();
+document.getElementById("backButton").onclick = () => {
+  chapterView.classList.add("hidden");
+  introScreen.classList.remove("hidden");
+};
 
 function generateCertificate() {
   const name = document.getElementById('playerName').value.trim();
@@ -79,6 +69,7 @@ function generateCertificate() {
     <h3>🎓 Certificate of Escape</h3>
     <p>This certifies that <strong>${name}</strong> successfully completed the Server Room Lockdown game.</p>
     <p>Time Taken: ${mins}:${secs}</p>
+    <canvas id="certCanvas" style="display:none;"></canvas>
     <button onclick="saveAsImage()">🖼️ Download Certificate</button>
     <button onclick="shareOnWhatsApp()">📤 Share via WhatsApp</button>
     <button onclick="submitFeedback()">💬 Submit Feedback</button>
@@ -99,7 +90,7 @@ function saveAsImage() {
 function shareOnWhatsApp() {
   const name = document.getElementById('playerName').value.trim();
   const time = document.getElementById('timer').textContent;
-  const message = `🎓 I escaped the Server Room Lockdown!\nName: ${name}\nTime: ${time}\nPlay it here: https://test-iq23.github.io/SERVER-ROOM-GAME/`;
+  const message = `🎓 I escaped the Server Room Lockdown!\nName: ${name}\nTime: ${time}\nPlay it yourself here: https://test-iq23.github.io/SERVER-ROOM-GAME/`;
   const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
 }
@@ -114,7 +105,6 @@ function submitToLeaderboard(time, name) {
   document.getElementById("leaderboardForm").submit();
 }
 
-// Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js').catch(console.error);
 }
