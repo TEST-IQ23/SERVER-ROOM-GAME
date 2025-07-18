@@ -7,84 +7,132 @@ body {
 }
 
 .container {
-  max-width: 700px;
+  max-width: 900px;
   margin: auto;
   padding: 2rem;
-  background: #161b22;
-  border-radius: 1rem;
-  box-shadow: 0 0 25px #58a6ff88;
-  animation: fadeIn 1s ease-in-out;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-h1, h2 {
+header h1 {
   color: #58a6ff;
+  margin-bottom: 1rem;
 }
 
-input[type="text"] {
-  width: 100%;
-  padding: 0.75rem;
-  margin: 1rem 0;
-  border: none;
-  border-radius: 0.5rem;
+.player-info {
   font-size: 1rem;
-  background-color: #0d1117;
-  color: #fff;
-}
-
-button {
-  background: #238636;
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  cursor: pointer;
-  margin: 0.5rem 0;
-}
-
-button:hover {
-  background-color: #2ea043;
-}
-
-.hidden {
-  display: none;
-}
-
-.success {
-  color: #3fb950;
-}
-
-#certificate {
-  margin-top: 2rem;
-  background: #0d1117;
-  padding: 2rem;
-  border: 2px dashed #58a6ff;
-  border-radius: 1rem;
-  text-align: center;
-}
-
-#timer {
-  float: right;
   font-weight: bold;
   color: #f0f6fc;
-}
-
-.chapter-button {
-  background: #8250df;
-  display: block;
-  width: 100%;
-  margin: 0.5rem 0;
 }
 
 .narrative {
   background-color: #21262d;
   padding: 1rem;
   border-radius: 0.5rem;
-  margin: 1rem 0;
   font-style: italic;
+  margin-bottom: 2rem;
+}
+
+/* Chapter Card Grid */
+.chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Chapter Card */
+.chapter-card {
+  background-color: #161b22;
+  border: 2px solid #30363d;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  transition: transform 0.2s, border-color 0.3s;
+  cursor: pointer;
+  position: relative;
+}
+
+.chapter-card:hover {
+  transform: translateY(-5px);
+  border-color: #58a6ff;
+}
+
+.chapter-card.completed {
+  border-color: #3fb950;
+}
+
+.chapter-card.locked {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.chapter-card h3 {
+  margin: 0;
+  color: #58a6ff;
+}
+
+.chapter-card p {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.progress-dot {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  height: 10px;
+  width: 10px;
+  background-color: #3fb950;
+  border-radius: 50%;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Question Area */
+#chapter-view {
+  margin-top: 2rem;
+}
+
+.question {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #21262d;
+  border-radius: 0.5rem;
+}
+
+button {
+  background: #238636;
+  color: white;
+  padding: 0.6rem 1rem;
+  margin-top: 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+button:hover {
+  background: #2ea043;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  background-color: #0d1117;
+  color: white;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+}
+
+.success {
+  color: #3fb950;
+  font-size: 1.2rem;
 }
