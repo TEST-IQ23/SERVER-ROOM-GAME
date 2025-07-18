@@ -9,75 +9,105 @@
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(#0d1117, #161b22);
-      color: #c9d1d9;
-      margin: 0;
-      padding: 0;
+      color: #fff;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-    }
-
-    .start-container {
-      background: #161b22;
-      padding: 2rem;
-      border-radius: 1rem;
-      text-align: center;
-      box-shadow: 0 0 25px #58a6ff88;
-      width: 90%;
-      max-width: 400px;
+      min-height: 100vh;
+      padding: 20px;
     }
 
     h1 {
+      font-size: 2rem;
       color: #58a6ff;
-      margin-bottom: 1rem;
+      margin-bottom: 10px;
     }
 
     input[type="text"] {
-      width: 100%;
-      padding: 0.75rem;
-      margin: 1rem 0;
+      padding: 10px;
+      border-radius: 4px;
       border: none;
-      border-radius: 0.5rem;
       font-size: 1rem;
-      background-color: #0d1117;
-      color: #fff;
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 20px;
     }
 
-    button {
-      background: #238636;
+    .btn {
+      background-color: #28a745;
       color: white;
-      padding: 0.6rem 1.2rem;
-      border: none;
-      border-radius: 0.5rem;
+      padding: 10px 20px;
       font-size: 1rem;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
+      margin-bottom: 30px;
+    }
+
+    .chapter-list {
+      display: none;
+      max-width: 600px;
       width: 100%;
     }
 
-    button:hover {
-      background-color: #2ea043;
+    .chapter-item {
+      background: #21262d;
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .chapter-item:hover {
+      background: #30363d;
     }
   </style>
 </head>
 <body>
-  <div class="start-container">
-    <h1>🔐 Server Room Lockdown</h1>
-    <p>Agent, enter your codename to begin your mission:</p>
-    <input type="text" id="playerName" placeholder="Enter your name..." />
-    <button onclick="startGame()">Start Mission 🚀</button>
+
+  <h1>🔐 Server Room Lockdown</h1>
+  <p>Agent, enter your name to begin the mission:</p>
+  <input type="text" id="playerName" placeholder="Enter your name" />
+  <button class="btn" onclick="startMission()">Start Mission</button>
+
+  <div class="chapter-list" id="chapterList">
+    <h2>Available Missions</h2>
+    <div id="chapters"></div>
   </div>
 
-  <script>
-    function startGame() {
+  <script type="module">
+    import chapters from './chapters.js';
+
+    const chapterList = document.getElementById("chapterList");
+    const chaptersDiv = document.getElementById("chapters");
+
+    function startMission() {
       const name = document.getElementById("playerName").value.trim();
       if (!name) {
-        alert("Please enter your name to start.");
+        alert("Please enter your name to continue.");
         return;
       }
+
       localStorage.setItem("playerName", name);
-      window.location.href = "chapters.html";
+      chapterList.style.display = "block";
+      renderChapters();
+    }
+
+    function renderChapters() {
+      Object.keys(chapters).forEach(chapterId => {
+        const chapter = chapters[chapterId];
+        const div = document.createElement("div");
+        div.className = "chapter-item";
+        div.innerHTML = `<strong>Chapter ${chapterId}</strong>: ${chapter.title}`;
+        div.onclick = () => {
+          window.location.href = `chapters.html?chapter=${chapterId}`;
+        };
+        chaptersDiv.appendChild(div);
+      });
     }
   </script>
+
 </body>
 </html>
