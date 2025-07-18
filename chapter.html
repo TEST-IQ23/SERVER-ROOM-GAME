@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1 id="chapter-title">Chapter</h1>
+    <div id="timer">00:00</div>
+  </header>
+
+  <section id="questions-container">
+    <!-- Questions will be rendered here -->
+  </section>
+
+  <script src="chapters.js"></script>
+  <script>
+    const chapterIndex = new URLSearchParams(window.location.search).get('chapter');
+    const chapter = chapters[chapterIndex];
+
+    document.getElementById('chapter-title').textContent = `Chapter ${parseInt(chapterIndex) + 1}: ${chapter.title}`;
+
+    const container = document.getElementById('questions-container');
+
+    chapter.questions.forEach((q, i) => {
+      const div = document.createElement('div');
+      div.className = 'question-block';
+
+      const question = document.createElement('p');
+      question.textContent = `${i + 1}. ${q.question}`;
+      div.appendChild(question);
+
+      if (q.type === "MCQ") {
+        q.options.forEach(option => {
+          const label = document.createElement('label');
+          label.innerHTML = `
+            <input type="radio" name="q${i}" value="${option}" />
+            ${option}
+          `;
+          div.appendChild(label);
+          div.appendChild(document.createElement('br'));
+        });
+      } else if (q.type === "TEXT") {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = `q${i}`;
+        div.appendChild(input);
+      }
+
+      container.appendChild(div);
+    });
+
+    // Optional: Start timer like in index.html
+    let startTime = new Date();
+    setInterval(() => {
+      const now = new Date();
+      const elapsed = Math.floor((now - startTime) / 1000);
+      const minutes = String(Math.floor(elapsed / 60)).padStart(2, '0');
+      const seconds = String(elapsed % 60).padStart(2, '0');
+      document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+    }, 1000);
+  </script>
+</body>
+</html>
