@@ -2,25 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Server Room Lockdown</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h1>🔐 Server Room Lockdown <span id="timer"></span></h1>
+    <header>
+      <h1>🔐 Server Room Lockdown</h1>
+      <div class="player-info">
+        <span id="playerNameDisplay"></span>
+        <span id="timer"></span>
+      </div>
+    </header>
 
-    <div class="narrative" id="intro-screen">
-      <p>You're trapped in the university's server room after a major system lockdown triggered by a cyberattack. Each chapter uncovers a layer of the mystery. Solve them all to escape...</p>
-      <div id="chapter-list"></div>
+    <div id="start-page">
+      <p class="narrative">
+        You're trapped in the university's server room after a major system lockdown triggered by a cyberattack.
+        Each chapter uncovers a layer of the mystery. Solve them all to escape...
+      </p>
+      <div id="chapter-list" class="chapter-grid"></div>
     </div>
 
-    <div id="chapter-view" class="hidden">
-      <button id="backButton">← Back to Chapters</button>
-      <h2 id="chapterTitle"></h2>
-      <div id="questionsContainer"></div>
-    </div>
+    <div id="chapter-view" class="hidden"></div>
 
     <div id="success" class="hidden">
       <h2 class="success">🎉 You Escaped!</h2>
