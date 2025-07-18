@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Server Room Lockdown</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <header>
-    <h1>🔓 Server Room Lockdown</h1>
-    <div id="timer">00:00</div>
-  </header>
-
-  <section id="intro">
-    <p>
-      You're trapped in the university's server room after a major system lockdown triggered by a cyberattack.
-      Each chapter uncovers a layer of the mystery. Solve them all to escape...
+  <div id="start-screen" class="center-screen">
+    <h1>🔐 Server Room Lockdown</h1>
+    <p class="intro-text">
+      A cyber breach has sealed the server room. Can you solve all 10 security challenges to escape?
     </p>
-  </section>
+    <button id="startBtn">🚀 Start Mission</button>
+  </div>
 
-  <section id="chapter-list">
-    <!-- Chapters will be injected here -->
-  </section>
+  <div id="chapter-list" class="hidden container">
+    <h2>📘 Chapters</h2>
+    <div id="chapterContainer" class="chapter-grid"></div>
+  </div>
 
-  <script src="chapters.js"></script>
+  <audio id="bg-music" src="assets/music/ambient.mp3" loop></audio>
+  <audio id="click-sound" src="assets/sfx/click.mp3"></audio>
+
   <script src="script.js"></script>
 </body>
 </html>
