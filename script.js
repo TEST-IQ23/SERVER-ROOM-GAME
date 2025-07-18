@@ -1,38 +1,54 @@
-let startTime;
+document.addEventListener("DOMContentLoaded", () => {
+  const startBtn = document.getElementById("startBtn");
+  const chapterList = document.getElementById("chapter-list");
+  const startScreen = document.getElementById("start-screen");
+  const chapterContainer = document.getElementById("chapterContainer");
+  const music = document.getElementById("bg-music");
+  const clickSound = document.getElementById("click-sound");
 
-function startTimer() {
-  startTime = new Date();
-  setInterval(() => {
-    const now = new Date();
-    const elapsed = Math.floor((now - startTime) / 1000);
-    const minutes = String(Math.floor(elapsed / 60)).padStart(2, '0');
-    const seconds = String(elapsed % 60).padStart(2, '0');
-    document.getElementById('timer').textContent = `${minutes}:${seconds}`;
-  }, 1000);
-}
+  const chapters = [
+    "Firewall Breach",
+    "Terminal Trace",
+    "Encryption Chaos",
+    "Database Leak",
+    "Code Injection",
+    "Packet Sniffed",
+    "Logic Lock",
+    "Rooted Secrets",
+    "Server Heatwave",
+    "The Final Override"
+  ];
 
-function loadChapters() {
-  const list = document.getElementById('chapter-list');
-  chapters.forEach((chapter, index) => {
-    const card = document.createElement('div');
-    card.className = 'chapter-card';
+  let unlockedChapters = parseInt(localStorage.getItem("unlockedChapters")) || 1;
 
-    const title = document.createElement('h3');
-    // Remove duplicate "Chapter X:" prefix from title
-    title.textContent = `Chapter ${index + 1}: ${chapter.title.replace(/^Chapter\s\d+:\s*/, "")}`;
+  function playClick() {
+    clickSound.currentTime = 0;
+    clickSound.play();
+  }
 
-    card.appendChild(title);
+  function showChapters() {
+    chapterContainer.innerHTML = "";
+    chapters.forEach((title, i) => {
+      const card = document.createElement("div");
+      card.className = "chapter-card";
+      if (i + 1 > unlockedChapters) card.classList.add("locked");
 
-    card.addEventListener('click', () => {
-      localStorage.setItem('currentChapter', index);
-      window.location.href = `chapter.html?chapter=${index}`;
+      card.innerHTML = `<h3>Chapter ${i + 1}</h3><p>${title}</p>`;
+      card.onclick = () => {
+        playClick();
+        window.location.href = `chapter.html?chapter=${i + 1}`;
+      };
+
+      chapterContainer.appendChild(card);
     });
+  }
 
-    list.appendChild(card);
-  });
-}
-
-window.onload = function () {
-  startTimer();
-  loadChapters();
-};
+  startBtn.onclick = () => {
+    playClick();
+    startScreen.classList.add("hidden");
+    chapterList.classList.remove("hidden");
+    music.volume = 0.3;
+    music.play();
+    showChapters();
+  };
+});
