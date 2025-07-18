@@ -1,135 +1,120 @@
-let currentChapter = 0;
-let currentQuestion = 0;
-let score = 0;
-let startTime;
-let interval;
-let playerName = "";
-let playerEmail = "";
-let randomizedChapters = [];
-
-function startGame() {
-  playerName = document.getElementById("playerName").value.trim();
-  playerEmail = document.getElementById("playerEmail").value.trim();
-
-  if (!playerName || !playerEmail.includes("@")) {
-    alert("Please enter a valid name and email.");
-    return;
-  }
-
-  document.getElementById("player-info-form").classList.add("hidden");
-  document.getElementById("game-ui").classList.remove("hidden");
-
-  randomizedChapters = chapters.map(ch => ({
-    ...ch,
-    questions: shuffleArray([...ch.questions])
-  }));
-
-  startTime = Date.now();
-  interval = setInterval(updateTimer, 1000);
-  loadChapter();
-}
-
-function loadChapter() {
-  const chapter = randomizedChapters[currentChapter];
-  document.getElementById("chapter-title").innerText = chapter.title;
-  document.getElementById("question-container").innerHTML = "";
-
-  chapter.questions.forEach((q, idx) => {
-    const questionEl = document.createElement("div");
-    questionEl.innerHTML = `<p>${idx + 1}. ${q.q}</p>`;
-    
-    q.options.forEach(opt => {
-      const optBtn = document.createElement("button");
-      optBtn.textContent = opt;
-      optBtn.className = "option-button";
-      optBtn.onclick = () => checkAnswer(optBtn, opt, q.answer);
-      questionEl.appendChild(optBtn);
-    });
-
-    document.getElementById("question-container").appendChild(questionEl);
-  });
-
-  updateProgress();
-  document.getElementById("prevBtn").disabled = currentChapter === 0;
-  document.getElementById("nextBtn").disabled = currentChapter >= randomizedChapters.length - 1;
-  localStorage.setItem("progress", currentChapter);
-}
-
-function checkAnswer(button, selected, correct) {
-  if (button.classList.contains("correct") || button.classList.contains("wrong")) return;
-
-  if (selected === correct) {
-    button.classList.add("correct");
-    score += 1;
-  } else {
-    button.classList.add("wrong");
-  }
-
-  updateScore();
-}
-
-function nextChapter() {
-  if (currentChapter < randomizedChapters.length - 1) {
-    currentChapter++;
-    loadChapter();
-  } else {
-    endGame();
-  }
-}
-
-function prevChapter() {
-  if (currentChapter > 0) {
-    currentChapter--;
-    loadChapter();
-  }
-}
-
-function updateProgress() {
-  const progress = ((currentChapter + 1) / randomizedChapters.length) * 100;
-  document.getElementById("progress-fill").style.width = `${progress}%`;
-}
-
-function updateScore() {
-  document.getElementById("score-display").innerText = `Score: ${score}`;
-}
+let startTime = Date.now();
+let completedChapters = 0;
 
 function updateTimer() {
-  const seconds = Math.floor((Date.now() - startTime) / 1000);
-  document.getElementById("timer-display").innerText = `Time: ${seconds}s`;
+  const now = Date.now();
+  const elapsed = Math.floor((now - startTime) / 1000);
+  const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+  const secs = (elapsed % 60).toString().padStart(2, '0');
+  document.getElementById('timer').textContent = `${mins}:${secs}`;
+}
+setInterval(updateTimer, 1000);
+
+const container = document.getElementById('game-container');
+
+function updateProgress() {
+  const percent = Math.floor((completedChapters / chapters.length) * 100);
+  document.getElementById("progressBar").style.width = percent + "%";
 }
 
-function endGame() {
-  clearInterval(interval);
-  document.getElementById("game-ui").classList.add("hidden");
-  document.getElementById("completion-screen").classList.remove("hidden");
-  document.getElementById("final-score").innerText = `${score}`;
-  document.getElementById("final-time").innerText = `${Math.floor((Date.now() - startTime) / 1000)}s`;
+function renderChapter(chapter, index) {
+  const chapterDiv = document.createElement('div');
+  chapterDiv.className = 'chapter';
+  chapterDiv.innerHTML = `<h2>${chapter.title}</h2>`;
+  let correctAnswers = 0;
 
-  showFeedbackForm();
+  chapter.questions.forEach((question, qIndex) => {
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'question';
+    questionDiv.innerHTML = `<p><strong>Q${qIndex + 1}:</strong> ${question.q}</p>`;
+
+    question.options.forEach(option => {
+      const btn = document.createElement('button');
+      btn.textContent = option;
+      btn.onclick = () => {
+        if (btn.disabled) return;
+
+        if (option === question.answer) {
+          btn.style.background = '#238636';
+          correctAnswers++;
+        } else {
+          btn.style.background = '#da3633';
+        }
+
+        Array.from(questionDiv.querySelectorAll("button")).forEach(b => b.disabled = true);
+
+        if (correctAnswers === chapter.questions.length) {
+          completedChapters++;
+          updateProgress();
+          if (completedChapters === chapters.length) {
+            document.getElementById('success').classList.remove('hidden');
+          }
+        }
+      };
+      questionDiv.appendChild(btn);
+    });
+
+    chapterDiv.appendChild(questionDiv);
+  });
+
+  container.appendChild(chapterDiv);
 }
 
-function showFeedbackForm() {
-  const form = document.getElementById("feedback-form");
-  const baseURL = "https://docs.google.com/forms/d/e/1FAIpQLSdu_fdi2qxup0D28h-bQXbrcpJJzm4AXZP9ByM57p9UXA06GQ/viewform";
-  form.src = `${baseURL}?embedded=true&entry.123456=${encodeURIComponent(playerName)}&entry.789101=${encodeURIComponent(playerEmail)}&entry.112233=${score}`;
-  form.classList.remove("hidden");
+chapters.forEach((chapter, i) => {
+  renderChapter(chapter, i);
+});
+updateProgress();
+
+function generateCertificate() {
+  const name = document.getElementById('playerName').value.trim();
+  if (!name) return alert("Please enter your name");
+
+  const endTime = Date.now();
+  const elapsed = Math.floor((endTime - startTime) / 1000);
+  const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+  const secs = (elapsed % 60).toString().padStart(2, '0');
+  const cert = document.getElementById('certificate');
+  cert.classList.remove('hidden');
+  cert.innerHTML = `
+    <h3>🎓 Certificate of Escape</h3>
+    <p>This certifies that <strong>${name}</strong> successfully completed the Server Room Lockdown game.</p>
+    <p>Time Taken: ${mins}:${secs}</p>
+    <button onclick="saveAsImage()">🖼️ Download Certificate</button>
+    <button onclick="shareOnWhatsApp()">📤 Share via WhatsApp</button>
+    <button onclick="submitFeedback()">💬 Submit Feedback</button>
+  `;
+  submitToLeaderboard(`${mins}:${secs}`, name);
 }
 
-function shareViaWhatsApp() {
-  const text = `I just completed the Server Room Lockdown escape room with score ${score}! Try it now.`;
-  const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-  window.open(url, "_blank");
+function saveAsImage() {
+  const cert = document.getElementById("certificate");
+  html2canvas(cert).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'certificate.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  });
 }
 
-function submitToLeaderboard() {
-  const leaderboardURL = `https://docs.google.com/forms/d/e/1FAIpQLSd_leaderboard/viewform?embedded=true&entry.001=${playerName}&entry.002=${playerEmail}&entry.003=${score}`;
-  window.open(leaderboardURL, "_blank");
+function shareOnWhatsApp() {
+  const name = document.getElementById('playerName').value.trim();
+  const time = document.getElementById('timer').textContent;
+  const message = `🎓 I escaped the Server Room Lockdown!\nName: ${name}\nTime: ${time}\nPlay it here: https://test-iq23.github.io/SERVER-ROOM-GAME/`;
+  const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
 }
 
-function shuffleArray(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+function submitFeedback() {
+  window.open("https://docs.google.com/forms/d/e/1FAIpQLSdu_fdi2qxup0D28h-bQXbrcpJJzm4AXZP9ByM57p9UXA06GQ/viewform?usp=dialog", "_blank");
+}
+
+function submitToLeaderboard(time, name) {
+  document.getElementById("formName").value = name;
+  document.getElementById("formTime").value = time;
+  document.getElementById("leaderboardForm").submit();
+}
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').catch(console.error);
 }
