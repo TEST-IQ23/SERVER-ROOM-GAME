@@ -1,110 +1,151 @@
-let startTime = Date.now();
+let playerName = localStorage.getItem("playerName") || "";
+let startTime = localStorage.getItem("startTime") || new Date().toISOString();
+let currentChapter = null;
 
-const introScreen = document.getElementById("intro-screen");
-const chapterView = document.getElementById("chapter-view");
-const chapterTitle = document.getElementById("chapterTitle");
-const questionsContainer = document.getElementById("questionsContainer");
-const chapterList = document.getElementById("chapter-list");
-
-function updateTimer() {
-  const now = Date.now();
-  const elapsed = Math.floor((now - startTime) / 1000);
-  const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
-  const secs = (elapsed % 60).toString().padStart(2, '0');
-  document.getElementById('timer').textContent = `${mins}:${secs}`;
-}
-setInterval(updateTimer, 1000);
-
-chapters.forEach((chapter, index) => {
-  const btn = document.createElement('button');
-  btn.innerText = `Chapter ${index + 1}: ${chapter.title}`;
-  btn.className = 'chapter-button';
-  btn.onclick = () => loadChapter(index);
-  chapterList.appendChild(btn);
-});
-
-function loadChapter(index) {
-  introScreen.classList.add("hidden");
-  chapterView.classList.remove("hidden");
-  chapterTitle.innerText = `Chapter ${index + 1}: ${chapters[index].title}`;
-  questionsContainer.innerHTML = "";
-
-  chapters[index].questions.forEach((question, qIndex) => {
-    const div = document.createElement('div');
-    div.innerHTML = `<p><strong>Q${qIndex + 1}:</strong> ${question.q}</p>`;
-
-    question.options.forEach(option => {
-      const btn = document.createElement('button');
-      btn.innerText = option;
-      btn.onclick = () => {
-        if (option === question.answer) {
-          alert("✅ Correct!");
-        } else {
-          alert("❌ Wrong answer!");
-        }
-      };
-      div.appendChild(btn);
-    });
-
-    questionsContainer.appendChild(div);
-  });
-}
-
-document.getElementById("backButton").onclick = () => {
-  chapterView.classList.add("hidden");
-  introScreen.classList.remove("hidden");
+window.onload = () => {
+  if (!playerName) {
+    playerName = prompt("Enter your name:");
+    localStorage.setItem("playerName", playerName);
+  }
+  localStorage.setItem("startTime", startTime);
+  document.getElementById("playerNameDisplay").textContent = `👤 ${playerName}`;
+  loadChapters();
+  startTimer();
 };
 
-function generateCertificate() {
-  const name = document.getElementById('playerName').value.trim();
-  if (!name) return alert("Please enter your name");
-
-  const endTime = Date.now();
-  const elapsed = Math.floor((endTime - startTime) / 1000);
-  const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
-  const secs = (elapsed % 60).toString().padStart(2, '0');
-  const cert = document.getElementById('certificate');
-  cert.classList.remove('hidden');
-  cert.innerHTML = `
-    <h3>🎓 Certificate of Escape</h3>
-    <p>This certifies that <strong>${name}</strong> successfully completed the Server Room Lockdown game.</p>
-    <p>Time Taken: ${mins}:${secs}</p>
-    <canvas id="certCanvas" style="display:none;"></canvas>
-    <button onclick="saveAsImage()">🖼️ Download Certificate</button>
-    <button onclick="shareOnWhatsApp()">📤 Share via WhatsApp</button>
-    <button onclick="submitFeedback()">💬 Submit Feedback</button>
-  `;
-  submitToLeaderboard(`${mins}:${secs}`, name);
+// Timer Logic
+function startTimer() {
+  const start = new Date(startTime);
+  setInterval(() => {
+    const now = new Date();
+    const diff = new Date(now - start);
+    const mins = diff.getUTCMinutes().toString().padStart(2, '0');
+    const secs = diff.getUTCSeconds().toString().padStart(2, '0');
+    document.getElementById("timer").textContent = `⏱️ ${mins}:${secs}`;
+  }, 1000);
 }
 
-function saveAsImage() {
-  const cert = document.getElementById("certificate");
-  html2canvas(cert).then(canvas => {
-    const link = document.createElement('a');
-    link.download = 'certificate.png';
-    link.href = canvas.toDataURL();
-    link.click();
+// Load Chapters
+function loadChapters() {
+  const list = document.getElementById("chapter-list");
+  list.innerHTML = "";
+  chapters.forEach((chapter, index) => {
+    const isUnlocked = isChapterUnlocked(index);
+    const isCompleted = isChapterCompleted(index);
+
+    const card = document.createElement("div");
+    card.className = `chapter-card ${!isUnlocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''}`;
+    card.onclick = () => loadChapterView(index);
+
+    const title = document.createElement("h3");
+    title.textContent = chapter.title;
+
+    const desc = document.createElement("p");
+    desc.textContent = chapter.description;
+
+    card.appendChild(title);
+    card.appendChild(desc);
+
+    if (isCompleted) {
+      const dot = document.createElement("div");
+      dot.className = "progress-dot";
+      card.appendChild(dot);
+    }
+
+    list.appendChild(card);
   });
 }
 
-function shareOnWhatsApp() {
-  const name = document.getElementById('playerName').value.trim();
-  const time = document.getElementById('timer').textContent;
-  const message = `🎓 I escaped the Server Room Lockdown!\nName: ${name}\nTime: ${time}\nPlay it yourself here: https://test-iq23.github.io/SERVER-ROOM-GAME/`;
-  const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank');
+// Unlocking Rules
+function isChapterUnlocked(index) {
+  return index === 0 || isChapterCompleted(index - 1);
 }
 
-function submitFeedback() {
-  window.open("https://docs.google.com/forms/d/e/1FAIpQLSdu_fdi2qxup0D28h-bQXbrcpJJzm4AXZP9ByM57p9UXA06GQ/viewform?usp=dialog", "_blank");
+function isChapterCompleted(index) {
+  return localStorage.getItem(`chapter_${index}_complete`) === "true";
 }
 
-function submitToLeaderboard(time, name) {
+// Load Chapter View
+function loadChapterView(index) {
+  currentChapter = index;
+  const chapter = chapters[index];
+  document.getElementById("start-page").classList.add("hidden");
+  const view = document.getElementById("chapter-view");
+  view.innerHTML = `<h2>${chapter.title}</h2>`;
+  chapter.questions.forEach((q, i) => {
+    const block = document.createElement("div");
+    block.className = "question";
+    const prompt = document.createElement("p");
+    prompt.textContent = `${i + 1}. ${q.question}`;
+    block.appendChild(prompt);
+
+    q.options.forEach(option => {
+      const btn = document.createElement("button");
+      btn.textContent = option;
+      btn.onclick = () => checkAnswer(index, i, option, btn);
+      block.appendChild(btn);
+    });
+
+    view.appendChild(block);
+  });
+}
+
+// Answer Check
+function checkAnswer(chapterIdx, questionIdx, selected, btn) {
+  const correct = chapters[chapterIdx].questions[questionIdx].answer;
+  if (selected === correct) {
+    btn.style.backgroundColor = "#3fb950";
+    btn.disabled = true;
+
+    const allButtons = btn.parentElement.querySelectorAll("button");
+    allButtons.forEach(b => {
+      if (b !== btn) b.disabled = true;
+    });
+
+    if (isChapterFullyAnswered(chapterIdx)) {
+      localStorage.setItem(`chapter_${chapterIdx}_complete`, "true");
+      setTimeout(() => {
+        if (chapterIdx + 1 < chapters.length) {
+          loadChapters();
+          document.getElementById("chapter-view").classList.add("hidden");
+          document.getElementById("start-page").classList.remove("hidden");
+        } else {
+          showSuccess();
+        }
+      }, 1000);
+    }
+  } else {
+    btn.style.backgroundColor = "#da3633";
+  }
+}
+
+function isChapterFullyAnswered(index) {
+  const chapter = chapters[index];
+  const blocks = document.querySelectorAll(".question");
+  return Array.from(blocks).every(block =>
+    Array.from(block.querySelectorAll("button")).some(btn => btn.disabled && btn.style.backgroundColor === "rgb(63, 185, 80)")
+  );
+}
+
+// Game Completion
+function showSuccess() {
+  document.getElementById("chapter-view").classList.add("hidden");
+  document.getElementById("success").classList.remove("hidden");
+}
+
+// Certificate & Submission
+function generateCertificate() {
+  const name = document.getElementById("playerName").value || "Anonymous";
+  const time = document.getElementById("timer").textContent;
+
   document.getElementById("formName").value = name;
   document.getElementById("formTime").value = time;
   document.getElementById("leaderboardForm").submit();
-}
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js').catch(console.error);
+  const cert = document.getElementById("certificate");
+  cert.classList.remove("hidden");
+  cert.innerHTML = `<h3>🎖️ Certificate of Escape</h3><p>This certifies that <strong>${name}</strong> successfully escaped the Server Room in <strong>${time}</strong>.</p>`;
+  html2canvas(cert).then(canvas => {
+    cert.appendChild(canvas);
+  });
 }
