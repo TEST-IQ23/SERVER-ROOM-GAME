@@ -4,44 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Server Room Lockdown</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>🔐 Server Room Lockdown</h1>
-      <div class="player-info">
-        <span id="playerNameDisplay"></span>
-        <span id="timer"></span>
-      </div>
-    </header>
+  <header>
+    <h1>🔓 Server Room Lockdown</h1>
+    <div id="timer">00:00</div>
+  </header>
 
-    <div id="start-page">
-      <p class="narrative">
-        You're trapped in the university's server room after a major system lockdown triggered by a cyberattack.
-        Each chapter uncovers a layer of the mystery. Solve them all to escape...
-      </p>
-      <div id="chapter-list" class="chapter-grid"></div>
-    </div>
+  <section id="intro">
+    <p>
+      You're trapped in the university's server room after a major system lockdown triggered by a cyberattack.
+      Each chapter uncovers a layer of the mystery. Solve them all to escape...
+    </p>
+  </section>
 
-    <div id="chapter-view" class="hidden"></div>
+  <section id="chapter-list">
+    <!-- Chapters will be injected here -->
+  </section>
 
-    <div id="success" class="hidden">
-      <h2 class="success">🎉 You Escaped!</h2>
-      <p>You’ve restored server access and secured the system. Well done, agent!</p>
-      <input type="text" id="playerName" placeholder="Enter your name for the certificate" />
-      <button onclick="generateCertificate()">Generate Certificate</button>
-      <div id="certificate" class="hidden"></div>
-    </div>
-  </div>
-
-  <form id="leaderboardForm" action="https://docs.google.com/forms/d/e/1FAIpQLSe4EwuIPz9MRWBLtGwxFm-r9tt38uHa8R33UwMXnu-XQnZY2A/formResponse" method="POST" target="hidden_iframe" style="display:none">
-    <input name="entry.2060976916" id="formName" />
-    <input name="entry.225669406" id="formTime" />
-  </form>
-  <iframe name="hidden_iframe" style="display:none;"></iframe>
-
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="chapters.js"></script>
   <script src="script.js"></script>
 </body>
