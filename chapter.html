@@ -2,73 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chapter</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="chapter-container" class="container">
-    <h2 id="chapter-title">Chapter Loading...</h2>
-    <p id="chapter-intro" class="intro-text"></p>
-    <div id="questions"></div>
-    <button id="submitBtn">Submit Answers</button>
-    <p id="feedbackMsg" class="feedback"></p>
-    <a id="nextChapterLink" class="hidden" href="#">Go to Next Chapter →</a>
+  <div class="container">
+    <h1 id="chapter-title">Loading...</h1>
+    <div id="questions-container"></div>
+    <button id="submit-btn" class="submit-btn">Submit Answers</button>
+    <div id="feedback"></div>
+    <button onclick="goBack()" class="back-btn">⬅️ Back to Chapters</button>
   </div>
 
   <script src="chapters.js"></script>
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const chapterNum = parseInt(urlParams.get("chapter")) || 1;
-    const chapterData = chapters[chapterNum - 1];
+    const chapterParam = new URLSearchParams(window.location.search).get('chapter');
+    const chapterIndex = parseInt(chapterParam);
+    const chapter = chapters[chapterIndex];
 
-    const titleEl = document.getElementById("chapter-title");
-    const introEl = document.getElementById("chapter-intro");
-    const questionsEl = document.getElementById("questions");
-    const submitBtn = document.getElementById("submitBtn");
-    const feedbackEl = document.getElementById("feedbackMsg");
-    const nextLink = document.getElementById("nextChapterLink");
+    if (!chapter) {
+      document.getElementById("chapter-title").textContent = "Chapter not found!";
+    } else {
+      document.getElementById("chapter-title").textContent = chapter.title;
+      const container = document.getElementById("questions-container");
 
-    titleEl.textContent = `Chapter ${chapterNum}: ${chapterData.title}`;
-    introEl.textContent = chapterData.intro;
+      chapter.questions.forEach((q, index) => {
+        const questionBlock = document.createElement('div');
+        questionBlock.className = 'question-block';
 
-    chapterData.questions.forEach((q, index) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "question-block";
-      wrapper.innerHTML = `
-        <p>${index + 1}. ${q.question}</p>
-        ${q.options.map((opt, i) => `
-          <label>
-            <input type="radio" name="q${index}" value="${opt}">
-            ${opt}
-          </label><br>
-        `).join("")}
-      `;
-      questionsEl.appendChild(wrapper);
-    });
+        let html = `<p>${index + 1}. ${q.question}</p>`;
 
-    submitBtn.onclick = () => {
-      let correct = 0;
-      chapterData.questions.forEach((q, index) => {
-        const selected = document.querySelector(`input[name="q${index}"]:checked`);
-        if (selected && selected.value === q.answer) correct++;
-      });
-
-      const score = correct / chapterData.questions.length;
-      if (score === 1) {
-        feedbackEl.textContent = "✅ Excellent! Chapter completed.";
-        nextLink.classList.remove("hidden");
-
-        let unlocked = parseInt(localStorage.getItem("unlockedChapters")) || 1;
-        if (chapterNum >= unlocked && chapterNum < 10) {
-          localStorage.setItem("unlockedChapters", chapterNum + 1);
+        if (q.type === 'MCQ') {
+          q.options.forEach((option, i) => {
+            html += `
+              <label>
+                <input type="radio" name="q${index}" value="${option}">
+                ${option}
+              </label><br/>`;
+          });
+        } else if (q.type === 'text') {
+          html += `<input type="text" name="q${index}" placeholder="Your answer here" />`;
         }
 
-        nextLink.href = `chapter.html?chapter=${chapterNum + 1}`;
-      } else {
-        feedbackEl.textContent = `❌ You got ${correct} of ${chapterData.questions.length} correct. Try again.`;
-      }
-    };
+        questionBlock.innerHTML = html;
+        container.appendChild(questionBlock);
+      });
+
+      document.getElementById("submit-btn").addEventListener("click", () => {
+        let correct = 0;
+
+        chapter.questions.forEach((q, index) => {
+          const userInput = document.querySelector(`[name="q${index}"]:checked`)?.value ||
+                            document.querySelector(`[name="q${index}"]`)?.value?.trim();
+          if (userInput?.toLowerCase() === q.answer.toLowerCase()) correct++;
+        });
+
+        const feedback = document.getElementById("feedback");
+        feedback.innerHTML = `<p>You got ${correct} out of ${chapter.questions.length} correct!</p>`;
+
+        localStorage.setItem(`chapter_${chapterIndex}_score`, correct);
+      });
+    }
+
+    function goBack() {
+      window.location.href = "start.html";
+    }
   </script>
 </body>
 </html>
