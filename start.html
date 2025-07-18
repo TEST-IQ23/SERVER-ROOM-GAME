@@ -1,0 +1,86 @@
+<!-- start.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Server Room Lockdown - Start</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(#0d1117, #161b22);
+      color: #c9d1d9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .start-container {
+      text-align: center;
+      background: #161b22;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 25px #58a6ff88;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      color: #58a6ff;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      font-style: italic;
+    }
+
+    input {
+      padding: 0.7rem;
+      border-radius: 0.5rem;
+      border: none;
+      width: 100%;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      background: #0d1117;
+      color: white;
+    }
+
+    button {
+      background: #238636;
+      color: white;
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2ea043;
+    }
+  </style>
+</head>
+<body>
+  <div class="start-container">
+    <h1>🔐 Server Room Lockdown</h1>
+    <p>A digital escape room experience for first-year CS & IT students</p>
+    <input type="text" id="playerName" placeholder="Enter your name" />
+    <button onclick="startGame()">Start Mission 🚀</button>
+  </div>
+
+  <script>
+    function startGame() {
+      const name = document.getElementById('playerName').value.trim();
+      if (!name) return alert("Please enter your name");
+
+      localStorage.setItem('playerName', name);
+      window.location.href = "chapters.html";
+    }
+  </script>
+</body>
+</html>
