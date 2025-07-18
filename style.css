@@ -1,40 +1,18 @@
-/* Global Styles */
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(#0d1117, #161b22);
+  background: linear-gradient(to right, #0d1117, #161b22);
   color: #c9d1d9;
   margin: 0;
   padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: start;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-.container {
-  width: 100%;
-  max-width: 900px;
-  padding: 2rem;
-  background: #161b22;
-  border-radius: 1rem;
-  box-shadow: 0 0 25px #58a6ff88;
-  animation: fadeIn 0.8s ease-in-out;
-  margin-top: 2rem;
-}
-
-/* Animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Headings */
 h1, h2 {
   color: #58a6ff;
   text-align: center;
 }
 
-/* Buttons */
 button {
   background: #238636;
   color: white;
@@ -43,112 +21,68 @@ button {
   border-radius: 0.5rem;
   font-size: 1rem;
   cursor: pointer;
-  margin-top: 1rem;
+  transition: background 0.3s ease;
 }
 
 button:hover {
-  background-color: #2ea043;
+  background: #2ea043;
 }
 
-/* Inputs */
-input[type="text"], input[type="radio"] {
-  margin-top: 5px;
-}
-
-input[type="text"] {
-  width: 100%;
-  padding: 0.75rem;
-  margin: 1rem 0;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  background-color: #0d1117;
-  color: #fff;
-}
-
-/* Timer */
-#timer {
-  float: right;
-  font-weight: bold;
-  color: #f0f6fc;
-}
-
-/* Chapter List */
-.chapter-list {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 2rem;
-}
-
-.chapter-item {
-  background-color: #21262d;
-  border: 2px solid #30363d;
-  border-radius: 8px;
-  padding: 1rem 2rem;
-  margin: 0.5rem;
-  width: 80%;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.chapter-item:hover {
-  background-color: #30363d;
-}
-
-/* Certificate */
-#certificate {
-  margin-top: 2rem;
-  background: #0d1117;
-  padding: 2rem;
-  border: 2px dashed #58a6ff;
-  border-radius: 1rem;
-  text-align: center;
-}
-
-/* Success Message */
-.success {
-  color: #3fb950;
-  text-align: center;
-}
-
-/* Hidden Utility */
 .hidden {
   display: none;
 }
 
-/* Question Block (your new style) */
-.question-block {
-  background-color: #1e222a;
-  padding: 15px;
-  margin: 20px auto;
-  border-radius: 8px;
-  max-width: 700px;
-  color: #fff;
-}
-
-.question-block p {
-  font-weight: bold;
-}
-
-/* Feedback Button Group */
-.feedback-buttons {
+.center-screen {
   display: flex;
   flex-direction: column;
-  gap: 10px;
   align-items: center;
-  margin-top: 1rem;
+  justify-content: center;
+  height: 100vh;
+  padding: 2rem;
+  text-align: center;
 }
 
-@media screen and (max-width: 768px) {
-  .container {
-    padding: 1rem;
-  }
-  
-  .chapter-item {
-    width: 95%;
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 2rem;
+}
+
+.intro-text {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.chapter-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.chapter-card {
+  background: #1e222a;
+  padding: 1.2rem;
+  border-radius: 0.8rem;
+  box-shadow: 0 0 10px #58a6ff44;
+  width: 250px;
+  cursor: pointer;
+  transition: transform 0.3s;
+  text-align: center;
+}
+
+.chapter-card:hover {
+  transform: translateY(-5px);
+  background: #21262d;
+}
+
+.locked {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@media screen and (max-width: 600px) {
+  .chapter-card {
+    width: 100%;
   }
 }
