@@ -1,129 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Chapter View</title>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(#0d1117, #161b22);
-      color: #c9d1d9;
-      margin: 0;
-      padding: 2rem;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: #161b22;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 0 25px #58a6ff88;
-    }
-    h1 {
-      color: #58a6ff;
-    }
-    .question {
-      margin-bottom: 2rem;
-    }
-    .question input[type="text"] {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    .question button {
-      margin-top: 0.5rem;
-    }
-    .feedback {
-      margin-top: 0.5rem;
-      font-weight: bold;
-    }
-    .correct {
-      color: #3fb950;
-    }
-    .wrong {
-      color: #f85149;
-    }
-    .back-btn {
-      background: #8250df;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 0.5rem;
-      color: white;
-      cursor: pointer;
-      margin-bottom: 1rem;
-    }
-  </style>
+  <title>Chapter</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <button class="back-btn" onclick="window.location.href='index.html'">← Back to Chapters</button>
-    <h1 id="chapterTitle">Loading...</h1>
-    <div id="questionsContainer"></div>
+  <div id="chapter-container" class="container">
+    <h2 id="chapter-title">Chapter Loading...</h2>
+    <p id="chapter-intro" class="intro-text"></p>
+    <div id="questions"></div>
+    <button id="submitBtn">Submit Answers</button>
+    <p id="feedbackMsg" class="feedback"></p>
+    <a id="nextChapterLink" class="hidden" href="#">Go to Next Chapter →</a>
   </div>
 
   <script src="chapters.js"></script>
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const chapterIndex = parseInt(params.get("chapter"));
-    const container = document.getElementById("questionsContainer");
-    const title = document.getElementById("chapterTitle");
+    const urlParams = new URLSearchParams(window.location.search);
+    const chapterNum = parseInt(urlParams.get("chapter")) || 1;
+    const chapterData = chapters[chapterNum - 1];
 
-    if (isNaN(chapterIndex) || chapterIndex < 0 || chapterIndex >= chapters.length) {
-      title.textContent = "Invalid Chapter";
-    } else {
-      const chapter = chapters[chapterIndex];
-      title.textContent = chapter.title;
+    const titleEl = document.getElementById("chapter-title");
+    const introEl = document.getElementById("chapter-intro");
+    const questionsEl = document.getElementById("questions");
+    const submitBtn = document.getElementById("submitBtn");
+    const feedbackEl = document.getElementById("feedbackMsg");
+    const nextLink = document.getElementById("nextChapterLink");
 
-      chapter.questions.forEach((question, qIndex) => {
-        const div = document.createElement("div");
-        div.className = "question";
-        div.innerHTML = `<p><strong>Q${qIndex + 1}:</strong> ${question.q}</p>`;
+    titleEl.textContent = `Chapter ${chapterNum}: ${chapterData.title}`;
+    introEl.textContent = chapterData.intro;
 
-        let feedback = document.createElement("div");
-        feedback.className = "feedback";
+    chapterData.questions.forEach((q, index) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "question-block";
+      wrapper.innerHTML = `
+        <p>${index + 1}. ${q.question}</p>
+        ${q.options.map((opt, i) => `
+          <label>
+            <input type="radio" name="q${index}" value="${opt}">
+            ${opt}
+          </label><br>
+        `).join("")}
+      `;
+      questionsEl.appendChild(wrapper);
+    });
 
-        if (question.type === "mcq") {
-          question.options.forEach(option => {
-            const btn = document.createElement("button");
-            btn.textContent = option;
-            btn.onclick = () => {
-              if (option === question.answer) {
-                feedback.textContent = "✅ Correct!";
-                feedback.className = "feedback correct";
-              } else {
-                feedback.textContent = "❌ Wrong!";
-                feedback.className = "feedback wrong";
-              }
-            };
-            div.appendChild(btn);
-          });
-        } else {
-          const input = document.createElement("input");
-          input.type = "text";
-          input.placeholder = "Your answer";
-          const btn = document.createElement("button");
-          btn.textContent = "Submit";
-          btn.onclick = () => {
-            const userAnswer = input.value.trim().toLowerCase();
-            const correctAnswer = question.answer.toLowerCase();
-            if (userAnswer === correctAnswer) {
-              feedback.textContent = "✅ Correct!";
-              feedback.className = "feedback correct";
-            } else {
-              feedback.textContent = "❌ Incorrect!";
-              feedback.className = "feedback wrong";
-            }
-          };
-          div.appendChild(input);
-          div.appendChild(btn);
+    submitBtn.onclick = () => {
+      let correct = 0;
+      chapterData.questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selected && selected.value === q.answer) correct++;
+      });
+
+      const score = correct / chapterData.questions.length;
+      if (score === 1) {
+        feedbackEl.textContent = "✅ Excellent! Chapter completed.";
+        nextLink.classList.remove("hidden");
+
+        let unlocked = parseInt(localStorage.getItem("unlockedChapters")) || 1;
+        if (chapterNum >= unlocked && chapterNum < 10) {
+          localStorage.setItem("unlockedChapters", chapterNum + 1);
         }
 
-        div.appendChild(feedback);
-        container.appendChild(div);
-      });
-    }
+        nextLink.href = `chapter.html?chapter=${chapterNum + 1}`;
+      } else {
+        feedbackEl.textContent = `❌ You got ${correct} of ${chapterData.questions.length} correct. Try again.`;
+      }
+    };
   </script>
 </body>
 </html>
