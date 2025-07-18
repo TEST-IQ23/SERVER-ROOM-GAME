@@ -1,54 +1,72 @@
+// Load chapters from chapters.js and display them
 document.addEventListener("DOMContentLoaded", () => {
-  const startBtn = document.getElementById("startBtn");
-  const chapterList = document.getElementById("chapter-list");
-  const startScreen = document.getElementById("start-screen");
-  const chapterContainer = document.getElementById("chapterContainer");
-  const music = document.getElementById("bg-music");
-  const clickSound = document.getElementById("click-sound");
+  const chaptersList = document.getElementById("chaptersList");
+  const playerNameSpan = document.getElementById("playerName");
 
-  const chapters = [
-    "Firewall Breach",
-    "Terminal Trace",
-    "Encryption Chaos",
-    "Database Leak",
-    "Code Injection",
-    "Packet Sniffed",
-    "Logic Lock",
-    "Rooted Secrets",
-    "Server Heatwave",
-    "The Final Override"
-  ];
-
-  let unlockedChapters = parseInt(localStorage.getItem("unlockedChapters")) || 1;
-
-  function playClick() {
-    clickSound.currentTime = 0;
-    clickSound.play();
+  // Get player name from localStorage
+  const playerName = localStorage.getItem("playerName") || "Agent";
+  if (playerNameSpan) {
+    playerNameSpan.textContent = playerName;
   }
 
-  function showChapters() {
-    chapterContainer.innerHTML = "";
-    chapters.forEach((title, i) => {
-      const card = document.createElement("div");
-      card.className = "chapter-card";
-      if (i + 1 > unlockedChapters) card.classList.add("locked");
-
-      card.innerHTML = `<h3>Chapter ${i + 1}</h3><p>${title}</p>`;
-      card.onclick = () => {
-        playClick();
-        window.location.href = `chapter.html?chapter=${i + 1}`;
-      };
-
-      chapterContainer.appendChild(card);
+  // Load chapters from chapters.js (Code 2)
+  if (typeof chapters !== "undefined" && chapters.length > 0) {
+    chapters.forEach((chapter, index) => {
+      const chapterButton = document.createElement("button");
+      chapterButton.textContent = `Chapter ${index + 1}: ${chapter.title}`;
+      chapterButton.className = "chapter-button";
+      chapterButton.onclick = () => loadChapter(index);
+      chaptersList.appendChild(chapterButton);
     });
+  } else {
+    chaptersList.innerHTML = "<p>⚠️ No chapters available.</p>";
   }
-
-  startBtn.onclick = () => {
-    playClick();
-    startScreen.classList.add("hidden");
-    chapterList.classList.remove("hidden");
-    music.volume = 0.3;
-    music.play();
-    showChapters();
-  };
 });
+
+// Load selected chapter and display only its questions
+function loadChapter(chapterIndex) {
+  const chapter = chapters[chapterIndex];
+  const chaptersList = document.getElementById("chaptersList");
+  chaptersList.innerHTML = ""; // Clear previous list
+
+  const backBtn = document.createElement("button");
+  backBtn.textContent = "🔙 Back to Chapters";
+  backBtn.className = "back-button";
+  backBtn.onclick = () => location.reload();
+  chaptersList.appendChild(backBtn);
+
+  const chapterTitle = document.createElement("h2");
+  chapterTitle.textContent = chapter.title;
+  chaptersList.appendChild(chapterTitle);
+
+  chapter.questions.forEach((q, qIndex) => {
+    const questionBlock = document.createElement("div");
+    questionBlock.className = "question-block";
+
+    const questionText = document.createElement("p");
+    questionText.textContent = `${qIndex + 1}. ${q.question}`;
+    questionBlock.appendChild(questionText);
+
+    if (q.type === "MCQ") {
+      q.options.forEach((opt, optIndex) => {
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = `q${chapterIndex}_${qIndex}`;
+        input.value = opt;
+
+        label.appendChild(input);
+        label.append(` ${opt}`);
+        questionBlock.appendChild(label);
+        questionBlock.appendChild(document.createElement("br"));
+      });
+    } else if (q.type === "text") {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.name = `q${chapterIndex}_${qIndex}`;
+      questionBlock.appendChild(input);
+    }
+
+    chaptersList.appendChild(questionBlock);
+  });
+}
