@@ -1,181 +1,251 @@
 const chapters = [
   {
-    title: "Firewall Breach",
-    intro: "A firewall has blocked external communication. Decode the correct security path to bypass it.",
+    title: "Chapter 1: Firewall Breach",
     questions: [
       {
         type: "MCQ",
-        question: "What does a firewall primarily protect against?",
-        options: ["Physical theft", "Unauthorized access", "Disk failure", "Power outage"],
-        answer: "Unauthorized access"
+        question: "What is the main function of a firewall?",
+        options: [
+          "To store data",
+          "To monitor employee activity",
+          "To block unauthorized access",
+          "To manage passwords"
+        ],
+        answer: "To block unauthorized access"
       },
       {
         type: "MCQ",
-        question: "Which port is commonly used for HTTP?",
-        options: ["22", "443", "80", "3306"],
+        question: "Which port is typically used for HTTP traffic?",
+        options: ["21", "80", "443", "53"],
         answer: "80"
       }
     ]
   },
   {
-    title: "Terminal Trace",
-    intro: "A suspicious trace was detected in the terminal logs. Track it down before it’s too late.",
+    title: "Chapter 2: Malware Maze",
     questions: [
       {
         type: "MCQ",
-        question: "Which Linux command shows running processes?",
-        options: ["ls", "cd", "ps", "mkdir"],
-        answer: "ps"
+        question: "What type of malware disguises itself as legitimate software?",
+        options: ["Worm", "Ransomware", "Trojan", "Spyware"],
+        answer: "Trojan"
       },
       {
         type: "MCQ",
-        question: "What symbol is used to reference the home directory?",
-        options: ["/", "~", "$", "#"],
-        answer: "~"
+        question: "Which of the following is NOT a common sign of malware infection?",
+        options: [
+          "Increased system performance",
+          "Frequent crashes",
+          "Unusual pop-ups",
+          "Slow system speed"
+        ],
+        answer: "Increased system performance"
       }
     ]
   },
   {
-    title: "Encryption Chaos",
-    intro: "Critical files have been encrypted. Identify the algorithm before total lockout.",
+    title: "Chapter 3: Password Puzzle",
     questions: [
       {
         type: "MCQ",
-        question: "Which is a symmetric encryption algorithm?",
-        options: ["RSA", "DES", "ECC", "Diffie-Hellman"],
-        answer: "DES"
+        question: "Which is the most secure password?",
+        options: [
+          "123456",
+          "admin123",
+          "Qw!8$kLm9#",
+          "password"
+        ],
+        answer: "Qw!8$kLm9#"
       },
       {
         type: "MCQ",
-        question: "What does AES stand for?",
-        options: ["Advanced Encryption Standard", "Automated Encoding System", "Access Encryption Service", "Array Encoding Standard"],
-        answer: "Advanced Encryption Standard"
+        question: "How often should you change your passwords?",
+        options: [
+          "Never",
+          "Every 2 years",
+          "Every 6 months",
+          "Only when hacked"
+        ],
+        answer: "Every 6 months"
       }
     ]
   },
   {
-    title: "Database Leak",
-    intro: "Sensitive customer data is leaking. Pinpoint the injection point.",
+    title: "Chapter 4: Network Intrusion",
     questions: [
       {
         type: "MCQ",
-        question: "Which attack targets SQL databases?",
-        options: ["Phishing", "Brute Force", "SQL Injection", "Ransomware"],
-        answer: "SQL Injection"
+        question: "What does VPN stand for?",
+        options: [
+          "Virtual Private Network",
+          "Very Private Node",
+          "Verified Protected Net",
+          "Variable Protocol Name"
+        ],
+        answer: "Virtual Private Network"
       },
       {
         type: "MCQ",
-        question: "Which keyword is commonly used in SQL injection attacks?",
-        options: ["DELETE", "SELECT", "DROP", "' OR '1'='1"],
-        answer: "' OR '1'='1"
+        question: "What tool is commonly used to scan a network for vulnerabilities?",
+        options: ["Photoshop", "Nmap", "Excel", "SSH"],
+        answer: "Nmap"
       }
     ]
   },
   {
-    title: "Code Injection",
-    intro: "Malicious scripts have been found in your form inputs. Secure the backend!",
+    title: "Chapter 5: Encryption Escape",
     questions: [
       {
         type: "MCQ",
-        question: "What is the best way to prevent code injection?",
-        options: ["Encrypt passwords", "Use antivirus", "Input validation", "Restart server"],
+        question: "What does HTTPS indicate on a website?",
+        options: [
+          "The website is fast",
+          "The site is using encryption",
+          "The site has popups",
+          "The site is offline"
+        ],
+        answer: "The site is using encryption"
+      },
+      {
+        type: "MCQ",
+        question: "Which encryption method is commonly used for securing data?",
+        options: ["AES", "JPEG", "MP4", "HTML"],
+        answer: "AES"
+      }
+    ]
+  },
+  {
+    title: "Chapter 6: Social Engineering",
+    questions: [
+      {
+        type: "MCQ",
+        question: "What is a common form of social engineering attack?",
+        options: [
+          "Firewall bypass",
+          "Phishing",
+          "Port scanning",
+          "Code injection"
+        ],
+        answer: "Phishing"
+      },
+      {
+        type: "MCQ",
+        question: "Which behavior can help prevent social engineering?",
+        options: [
+          "Ignoring all emails",
+          "Verifying sender identity",
+          "Disabling antivirus",
+          "Turning off Wi-Fi"
+        ],
+        answer: "Verifying sender identity"
+      }
+    ]
+  },
+  {
+    title: "Chapter 7: DDoS Defense",
+    questions: [
+      {
+        type: "MCQ",
+        question: "What does DDoS stand for?",
+        options: [
+          "Direct Data on Server",
+          "Distributed Denial of Service",
+          "Dedicated Domain Output Service",
+          "Data Deletion Over System"
+        ],
+        answer: "Distributed Denial of Service"
+      },
+      {
+        type: "MCQ",
+        question: "What is a sign of a DDoS attack?",
+        options: [
+          "Faster site load times",
+          "High traffic from multiple sources",
+          "Lack of user engagement",
+          "Increased disk space"
+        ],
+        answer: "High traffic from multiple sources"
+      }
+    ]
+  },
+  {
+    title: "Chapter 8: Code Injection Crisis",
+    questions: [
+      {
+        type: "MCQ",
+        question: "What does SQL injection target?",
+        options: [
+          "Graphics rendering",
+          "Network cables",
+          "Databases",
+          "Printers"
+        ],
+        answer: "Databases"
+      },
+      {
+        type: "MCQ",
+        question: "Which practice helps prevent code injection?",
+        options: [
+          "Leaving forms unvalidated",
+          "Using plain HTML",
+          "Input validation",
+          "Avoiding database use"
+        ],
         answer: "Input validation"
-      },
-      {
-        type: "MCQ",
-        question: "What type of attack uses `<script>` tags in inputs?",
-        options: ["XSS", "SQLi", "MITM", "DoS"],
-        answer: "XSS"
       }
     ]
   },
   {
-    title: "Packet Sniffed",
-    intro: "Network packets are being monitored. Mask your traffic before it’s exposed.",
+    title: "Chapter 9: Insider Threat",
     questions: [
       {
         type: "MCQ",
-        question: "Which tool is used for packet sniffing?",
-        options: ["Wireshark", "FileZilla", "PuTTY", "Notepad++"],
-        answer: "Wireshark"
+        question: "What defines an insider threat?",
+        options: [
+          "A hacker from outside",
+          "A system update error",
+          "A trusted individual misusing access",
+          "Spam emails"
+        ],
+        answer: "A trusted individual misusing access"
       },
       {
         type: "MCQ",
-        question: "Which protocol is secure?",
-        options: ["HTTP", "FTP", "HTTPS", "Telnet"],
-        answer: "HTTPS"
+        question: "What policy reduces insider threats?",
+        options: [
+          "Zero trust policy",
+          "Open network access",
+          "Frequent password changes",
+          "Cloud hosting"
+        ],
+        answer: "Zero trust policy"
       }
     ]
   },
   {
-    title: "Logic Lock",
-    intro: "The digital lock requires solving a logic-based circuit puzzle.",
+    title: "Chapter 10: Final Challenge",
     questions: [
       {
         type: "MCQ",
-        question: "What does a NAND gate return when both inputs are 1?",
-        options: ["0", "1", "Error", "Undefined"],
-        answer: "0"
+        question: "Which of these best describes a strong cybersecurity policy?",
+        options: [
+          "One-time setup and forget",
+          "Only antivirus installation",
+          "Regular updates and training",
+          "Disabling firewalls"
+        ],
+        answer: "Regular updates and training"
       },
       {
         type: "MCQ",
-        question: "Which gate gives true only if inputs differ?",
-        options: ["AND", "XOR", "OR", "NOR"],
-        answer: "XOR"
-      }
-    ]
-  },
-  {
-    title: "Rooted Secrets",
-    intro: "Root access was compromised. Re-secure administrative privileges.",
-    questions: [
-      {
-        type: "MCQ",
-        question: "What is the root user in Linux?",
-        options: ["Guest", "Admin", "Superuser", "Rootkit"],
-        answer: "Superuser"
-      },
-      {
-        type: "MCQ",
-        question: "Which file stores user accounts in Linux?",
-        options: ["/etc/shadow", "/usr/bin", "/etc/passwd", "/home"],
-        answer: "/etc/passwd"
-      }
-    ]
-  },
-  {
-    title: "Server Heatwave",
-    intro: "Temperature sensors show abnormal heat levels. Act fast to prevent meltdown!",
-    questions: [
-      {
-        type: "MCQ",
-        question: "What can cause a server to overheat?",
-        options: ["Excess RAM", "Dust buildup", "HTTPS traffic", "Low disk usage"],
-        answer: "Dust buildup"
-      },
-      {
-        type: "MCQ",
-        question: "Which tool monitors CPU temperature?",
-        options: ["htop", "ping", "lm-sensors", "scp"],
-        answer: "lm-sensors"
-      }
-    ]
-  },
-  {
-    title: "The Final Override",
-    intro: "You've reached the final control console. One last puzzle stands in your way.",
-    questions: [
-      {
-        type: "MCQ",
-        question: "Which key combination forces a system reboot?",
-        options: ["Ctrl+C", "Ctrl+Z", "Ctrl+Alt+Del", "Alt+F4"],
-        answer: "Ctrl+Alt+Del"
-      },
-      {
-        type: "MCQ",
-        question: "What does BIOS stand for?",
-        options: ["Basic Input Output System", "Binary Integrated Operating System", "Boot Internal Output Standard", "Basic Integrated OS"],
-        answer: "Basic Input Output System"
+        question: "What should you do after a security breach?",
+        options: [
+          "Ignore and hope it goes away",
+          "Report, investigate, and improve defenses",
+          "Shut down permanently",
+          "Uninstall antivirus"
+        ],
+        answer: "Report, investigate, and improve defenses"
       }
     ]
   }
