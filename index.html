@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Server Room Lockdown</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <h1>🔒 Server Room Lockdown</h1>
+      <div id="player-info-form">
+        <input type="text" id="playerName" placeholder="Enter your name" required>
+        <input type="email" id="playerEmail" placeholder="Enter your email" required>
+        <button onclick="startGame()">Start Game</button>
+      </div>
+    </header>
+
+    <div id="game-ui" class="hidden">
+      <div id="progress-bar"><div id="progress-fill"></div></div>
+      <div id="chapter-title"></div>
+      <div id="question-container"></div>
+      <div id="navigation-buttons">
+        <button onclick="prevChapter()" id="prevBtn" disabled>Previous</button>
+        <button onclick="nextChapter()" id="nextBtn" disabled>Next</button>
+      </div>
+      <div id="score-display"></div>
+      <div id="timer-display">Time: 0s</div>
+    </div>
+
+    <div id="completion-screen" class="hidden">
+      <h2>🎉 Congratulations!</h2>
+      <p>Your Score: <span id="final-score"></span></p>
+      <p>Your Time: <span id="final-time"></span></p>
+      <iframe id="feedback-form" class="hidden"></iframe>
+      <button onclick="shareViaWhatsApp()">📤 Share on WhatsApp</button>
+      <button onclick="submitToLeaderboard()">🏆 Submit to Leaderboard</button>
+    </div>
+  </div>
+
+  <script src="chapters.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
