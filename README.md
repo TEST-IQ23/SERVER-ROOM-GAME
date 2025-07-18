@@ -9,7 +9,7 @@ You're trapped in the university's server room after a major system lockdown tri
 Each chapter reveals a layer of the mystery. Solve all the puzzles, beat the timer, and escape before it's too late!
 
 🚀 Live Demo
-🔗 Play Now on GitHub Pages
+🔗 [ Play Now](https://test-iq23.github.io/SERVER-ROOM-GAME/)
 
 🧠 Features
 ✅ 10 interactive chapters with MCQs
