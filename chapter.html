@@ -3,71 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chapter</title>
+  <title>Server Room Lockdown - Chapters</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="chapters.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <div class="container">
-    <h1 id="chapter-title">Loading...</h1>
-    <div id="questions-container"></div>
-    <button id="submit-btn" class="submit-btn">Submit Answers</button>
-    <div id="feedback"></div>
-    <button onclick="goBack()" class="back-btn">⬅️ Back to Chapters</button>
-  </div>
+  <header>
+    <h1>🧠 Welcome, <span id="playerName"></span></h1>
+    <p>Select a chapter to begin your mission.</p>
+  </header>
 
-  <script src="chapters.js"></script>
-  <script>
-    const chapterParam = new URLSearchParams(window.location.search).get('chapter');
-    const chapterIndex = parseInt(chapterParam);
-    const chapter = chapters[chapterIndex];
-
-    if (!chapter) {
-      document.getElementById("chapter-title").textContent = "Chapter not found!";
-    } else {
-      document.getElementById("chapter-title").textContent = chapter.title;
-      const container = document.getElementById("questions-container");
-
-      chapter.questions.forEach((q, index) => {
-        const questionBlock = document.createElement('div');
-        questionBlock.className = 'question-block';
-
-        let html = `<p>${index + 1}. ${q.question}</p>`;
-
-        if (q.type === 'MCQ') {
-          q.options.forEach((option, i) => {
-            html += `
-              <label>
-                <input type="radio" name="q${index}" value="${option}">
-                ${option}
-              </label><br/>`;
-          });
-        } else if (q.type === 'text') {
-          html += `<input type="text" name="q${index}" placeholder="Your answer here" />`;
-        }
-
-        questionBlock.innerHTML = html;
-        container.appendChild(questionBlock);
-      });
-
-      document.getElementById("submit-btn").addEventListener("click", () => {
-        let correct = 0;
-
-        chapter.questions.forEach((q, index) => {
-          const userInput = document.querySelector(`[name="q${index}"]:checked`)?.value ||
-                            document.querySelector(`[name="q${index}"]`)?.value?.trim();
-          if (userInput?.toLowerCase() === q.answer.toLowerCase()) correct++;
-        });
-
-        const feedback = document.getElementById("feedback");
-        feedback.innerHTML = `<p>You got ${correct} out of ${chapter.questions.length} correct!</p>`;
-
-        localStorage.setItem(`chapter_${chapterIndex}_score`, correct);
-      });
-    }
-
-    function goBack() {
-      window.location.href = "start.html";
-    }
-  </script>
+  <main id="chaptersList">
+    <!-- Chapters will be loaded here by script.js -->
+  </main>
 </body>
 </html>
