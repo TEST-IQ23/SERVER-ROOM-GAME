@@ -1,138 +1,61 @@
 body {
+  margin: 0;
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(#0d1117, #161b22);
   color: #c9d1d9;
-  margin: 0;
-  padding: 0;
-}
-
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
 }
 
 header {
+  text-align: center;
+  padding: 20px;
+  color: #58a6ff;
+  font-size: 1.5em;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
+  width: 100%;
+  max-width: 900px;
 }
 
-header h1 {
-  color: #58a6ff;
-  margin-bottom: 1rem;
+#timer {
+  font-size: 1em;
+  color: #c9d1d9;
+  align-self: center;
 }
 
-.player-info {
-  font-size: 1rem;
-  font-weight: bold;
-  color: #f0f6fc;
-}
-
-.narrative {
+#intro {
+  max-width: 700px;
   background-color: #21262d;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  font-style: italic;
-  margin-bottom: 2rem;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 10px auto;
+  text-align: center;
 }
 
-/* Chapter Card Grid */
-.chapter-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
+#chapter-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 30px 0;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-/* Chapter Card */
 .chapter-card {
-  background-color: #161b22;
-  border: 2px solid #30363d;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  transition: transform 0.2s, border-color 0.3s;
+  background-color: #238636;
+  padding: 20px;
+  border-radius: 8px;
+  color: white;
   cursor: pointer;
-  position: relative;
+  text-align: center;
+  min-width: 200px;
+  transition: transform 0.2s;
 }
 
 .chapter-card:hover {
-  transform: translateY(-5px);
-  border-color: #58a6ff;
-}
-
-.chapter-card.completed {
-  border-color: #3fb950;
-}
-
-.chapter-card.locked {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-.chapter-card h3 {
-  margin: 0;
-  color: #58a6ff;
-}
-
-.chapter-card p {
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-.progress-dot {
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  height: 10px;
-  width: 10px;
-  background-color: #3fb950;
-  border-radius: 50%;
-}
-
-.hidden {
-  display: none;
-}
-
-/* Question Area */
-#chapter-view {
-  margin-top: 2rem;
-}
-
-.question {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background-color: #21262d;
-  border-radius: 0.5rem;
-}
-
-button {
-  background: #238636;
-  color: white;
-  padding: 0.6rem 1rem;
-  margin-top: 0.75rem;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-button:hover {
-  background: #2ea043;
-}
-
-input[type="text"] {
-  width: 100%;
-  padding: 0.6rem;
-  margin-top: 0.5rem;
-  font-size: 1rem;
-  background-color: #0d1117;
-  color: white;
-  border: 1px solid #30363d;
-  border-radius: 0.5rem;
-}
-
-.success {
-  color: #3fb950;
-  font-size: 1.2rem;
+  transform: scale(1.05);
 }
