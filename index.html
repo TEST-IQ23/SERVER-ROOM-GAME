@@ -10,26 +10,27 @@
 <body>
   <div class="container">
     <h1>🔐 Server Room Lockdown <span id="timer"></span></h1>
-    <div class="narrative">
-      <p>You’re trapped in the university’s server room after a system lockdown. Each chapter reveals part of the mystery. Solve all to escape...</p>
+
+    <div class="narrative" id="intro-screen">
+      <p>You're trapped in the university's server room after a major system lockdown triggered by a cyberattack. Each chapter uncovers a layer of the mystery. Solve them all to escape...</p>
+      <div id="chapter-list"></div>
     </div>
 
-    <div id="progressBarContainer">
-      <div id="progressBar"></div>
+    <div id="chapter-view" class="hidden">
+      <button id="backButton">← Back to Chapters</button>
+      <h2 id="chapterTitle"></h2>
+      <div id="questionsContainer"></div>
     </div>
-
-    <div id="game-container" class="chapter-selection"></div>
 
     <div id="success" class="hidden">
       <h2 class="success">🎉 You Escaped!</h2>
       <p>You’ve restored server access and secured the system. Well done, agent!</p>
       <input type="text" id="playerName" placeholder="Enter your name for the certificate" />
-      <button onclick="generateCertificate()">🎓 Generate Certificate</button>
+      <button onclick="generateCertificate()">Generate Certificate</button>
       <div id="certificate" class="hidden"></div>
     </div>
   </div>
 
-  <!-- Hidden Google Form Submission -->
   <form id="leaderboardForm" action="https://docs.google.com/forms/d/e/1FAIpQLSe4EwuIPz9MRWBLtGwxFm-r9tt38uHa8R33UwMXnu-XQnZY2A/formResponse" method="POST" target="hidden_iframe" style="display:none">
     <input name="entry.2060976916" id="formName" />
     <input name="entry.225669406" id="formTime" />
