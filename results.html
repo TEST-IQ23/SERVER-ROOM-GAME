@@ -27,7 +27,6 @@
   </div>
 
   <script>
-    // ==== Load result data ====
     const playerName = localStorage.getItem('playerName') || 'Unknown Player';
     const chapterTitle = localStorage.getItem('lastChapter') || localStorage.getItem('selectedChapterTitle') || 'Unknown Chapter';
     const timeTaken = localStorage.getItem('timeTaken') || '0';
@@ -40,11 +39,13 @@
     document.getElementById('correctAnswers').textContent = correct;
     document.getElementById('wrongAnswers').textContent = wrong;
 
-    // ==== WhatsApp Share ====
+    const scoreText = `${correct} / 10`;
+    const datePlayed = new Date().toLocaleDateString();
+
+    // WhatsApp Share
     const shareText = `🎮 ${playerName} just completed "${chapterTitle}" in Server Room Lockdown!\n✅ ${correct} correct | ❌ ${wrong} wrong | ⏱️ ${timeTaken}s\nPlay now: [YOUR_GAME_LINK]`;
     document.getElementById('whatsappShare').href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
 
-    // ==== Certificate Download ====
     function downloadCertificate() {
       const certWindow = window.open('', '_blank');
       certWindow.document.write(`
@@ -65,30 +66,28 @@
       certWindow.print();
     }
 
-    // ==== Return to Chapters ====
     function goToChapters() {
       window.location.href = "chapters.html";
     }
 
-    // ==== Auto-submit to Google Form Leaderboard ====
     function submitToLeaderboard() {
-      const formURL = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse';
+      const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSe4EwuIPz9MRWBLtGwxFm-r9tt38uHa8R33UwMXnu-XQnZY2A/formResponse";
 
       const formData = new FormData();
-      formData.append('entry.YOUR_NAME_FIELD_ID', playerName);
-      formData.append('entry.YOUR_CHAPTER_FIELD_ID', chapterTitle);
-      formData.append('entry.YOUR_TIME_FIELD_ID', timeTaken);
-      formData.append('entry.YOUR_SCORE_FIELD_ID', correct);
-      formData.append('entry.YOUR_WRONG_FIELD_ID', wrong);
+      formData.append("entry.2060976916", playerName);
+      formData.append("entry.784134679", chapterTitle);
+      formData.append("entry.222168494", scoreText);
+      formData.append("entry.1033246286", datePlayed);
+      formData.append("entry.225669406", timeTaken);
 
       fetch(formURL, {
-        method: 'POST',
-        mode: 'no-cors',
+        method: "POST",
+        mode: "no-cors",
         body: formData
-      });
+      }).then(() => console.log("Leaderboard submission sent"))
+        .catch(err => console.error("Submission error:", err));
     }
 
-    // Auto-run leaderboard submission
     submitToLeaderboard();
   </script>
 </body>
