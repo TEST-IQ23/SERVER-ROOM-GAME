@@ -3,26 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Server Room Lockdown - Questions</title>
+  <title>Chapter Questions - Server Room Lockdown</title>
   <link rel="stylesheet" href="style.css" />
-  <script defer src="questions.js"></script>
 </head>
-<body>
-  <div class="container question-page">
-    <h1 id="chapterTitle">Chapter</h1>
-    <div id="timer">Time Left: 30s</div>
+<body class="question-page">
+  <div class="container">
+    <header>
+      <h1 id="chapter-title">Loading...</h1>
+      <div id="timer" class="timer">⏱️ 30s</div>
+    </header>
 
-    <div id="questionContainer" class="question-block">
-      <!-- Question will be injected here -->
-    </div>
-
-    <div id="feedback"></div>
+    <main id="question-container">
+      <p id="question" class="question-text">Loading question...</p>
+      <div id="options" class="options-grid"></div>
+      <div id="feedback" class="feedback"></div>
+    </main>
   </div>
 
+  <script src="questions.js"></script>
+  <!-- No need for script.js unless it’s needed -->
   <script>
     const chapterId = localStorage.getItem('selectedChapterId');
     const chapterTitle = localStorage.getItem('selectedChapterTitle');
-    document.getElementById('chapterTitle').textContent = `Chapter: ${chapterTitle}`;
+    document.getElementById('chapter-title').textContent = `Chapter: ${chapterTitle}`;
 
     const allQuestions = questions[chapterId];
     let currentQuestion = 0;
@@ -33,16 +36,15 @@
 
     function showQuestion() {
       const q = allQuestions[currentQuestion];
-      const container = document.getElementById('questionContainer');
+      const questionEl = document.getElementById('question');
+      const optionsEl = document.getElementById('options');
       const feedback = document.getElementById('feedback');
-      container.innerHTML = '';
+
+      questionEl.textContent = q.question;
+      optionsEl.innerHTML = '';
       feedback.textContent = '';
 
-      const questionEl = document.createElement('p');
-      questionEl.textContent = q.question;
-      container.appendChild(questionEl);
-
-      q.options.forEach((opt, idx) => {
+      q.options.forEach((opt) => {
         const btn = document.createElement('button');
         btn.textContent = opt;
         btn.className = 'option-button';
@@ -61,18 +63,18 @@
             }
           }, 1000);
         };
-        container.appendChild(btn);
+        optionsEl.appendChild(btn);
       });
     }
 
     function startTimer() {
       let timeLeft = 30;
       const timerDisplay = document.getElementById('timer');
-      timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+      timerDisplay.textContent = `⏱️ ${timeLeft}s`;
 
       timer = setInterval(() => {
         timeLeft--;
-        timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+        timerDisplay.textContent = `⏱️ ${timeLeft}s`;
         if (timeLeft <= 0) {
           clearInterval(timer);
           document.getElementById('feedback').textContent = '⏰ Time Up! Fail';
