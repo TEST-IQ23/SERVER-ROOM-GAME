@@ -1,206 +1,211 @@
-// script.js
-
-// Global variables
-let playerName = localStorage.getItem("playerName") || "";
-let selectedChapterId = localStorage.getItem("selectedChapterId");
-let selectedChapterTitle = localStorage.getItem("selectedChapterTitle");
-let questions = [];
-let currentQuestionIndex = 0;
-let score = 0;
-let totalTimeTaken = 0;
-let questionTimer;
-let questionStartTime;
-
-// Page Detection
-const currentPage = window.location.pathname.split("/").pop();
-
-// Helper Functions
-function $(id) {
-  return document.getElementById(id);
+// General utility to get and set localStorage
+function setItem(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+function getItem(key) {
+  const value = localStorage.getItem(key);
+  return value ? JSON.parse(value) : null;
 }
 
-function startTimer(duration, onTimeout) {
-  let timeLeft = duration;
-  $("timer").textContent = `${timeLeft}s`;
-  questionTimer = setInterval(() => {
-    timeLeft--;
-    $("timer").textContent = `${timeLeft}s`;
-    if (timeLeft <= 0) {
-      clearInterval(questionTimer);
-      onTimeout();
+// Redirect to chapters if name is set
+function checkPlayerName() {
+  const playerName = getItem("playerName");
+  if (!playerName) {
+    window.location.href = "start.html";
+  }
+  return playerName;
+}
+
+// Page 1: Handle start.html
+function handleStartPage() {
+  const startBtn = document.getElementById("startBtn");
+  startBtn.addEventListener("click", () => {
+    const nameInput = document.getElementById("playerName").value.trim();
+    if (nameInput) {
+      setItem("playerName", nameInput);
+      window.location.href = "chapters.html";
+    } else {
+      alert("Please enter your name to start.");
     }
-  }, 1000);
+  });
 }
 
-function loadChapters() {
+// Page 2: Handle chapters.html
+function handleChaptersPage() {
+  const name = checkPlayerName();
+  document.getElementById("welcomeName").textContent = name;
+
   fetch("chapters.js")
-    .then((res) => res.text())
-    .then((text) => {
-      eval(text); // loads `chapters` array
-      const chapterList = $("chapterList");
-      $("playerNameDisplay").textContent = playerName;
-      chapters.forEach((chapter) => {
+    .then(res => res.text())
+    .then(data => {
+      eval(data); // Loads window.chapters
+      const list = document.getElementById("chapterList");
+      window.chapters.forEach(chapter => {
         const btn = document.createElement("button");
+        btn.className = "chapter-button";
         btn.textContent = chapter.title;
-        btn.className = "chapter-btn";
-        btn.onclick = () => {
-          localStorage.setItem("selectedChapterId", chapter.id);
-          localStorage.setItem("selectedChapterTitle", chapter.title);
+        btn.addEventListener("click", () => {
+          setItem("currentChapter", chapter);
           window.location.href = "question.html";
-        };
-        chapterList.appendChild(btn);
+        });
+        list.appendChild(btn);
       });
     });
 }
 
-function loadQuestions() {
+// Page 3: Handle question.html
+let timer;
+let timeTaken = 0;
+
+function handleQuestionPage() {
+  const chapter = getItem("currentChapter");
+  const playerName = checkPlayerName();
+  if (!chapter) {
+    window.location.href = "chapters.html";
+    return;
+  }
+
+  document.getElementById("chapterTitle").textContent = chapter.title;
+
   fetch("questions.js")
-    .then((res) => res.text())
-    .then((text) => {
-      eval(text); // loads `allQuestions` object
-      questions = allQuestions[selectedChapterId];
-      $("chapterTitle").textContent = selectedChapterTitle;
+    .then(res => res.text())
+    .then(data => {
+      eval(data); // Loads window.questions
+      const questions = window.questions[chapter.id];
+      let index = 0;
+      let score = 0;
+
+      function showQuestion() {
+        if (index >= questions.length) {
+          clearInterval(timer);
+          const totalTime = `${timeTaken}s`;
+          setItem("result", {
+            chapter: chapter.title,
+            score,
+            total: questions.length,
+            time: totalTime,
+            player: playerName,
+            date: new Date().toLocaleDateString()
+          });
+          window.location.href = "results.html";
+          return;
+        }
+
+        const q = questions[index];
+        document.getElementById("questionText").textContent = q.question;
+        const optionsBox = document.getElementById("optionsBox");
+        const feedback = document.getElementById("feedback");
+        optionsBox.innerHTML = "";
+        feedback.textContent = "";
+
+        q.options.forEach(option => {
+          const btn = document.createElement("button");
+          btn.className = "option-button";
+          btn.textContent = option;
+          btn.addEventListener("click", () => {
+            const correct = option === q.answer;
+            feedback.textContent = correct ? "✅ Pass" : "❌ Fail";
+            if (correct) score++;
+            index++;
+            setTimeout(showQuestion, 1000);
+          });
+          optionsBox.appendChild(btn);
+        });
+      }
+
+      let secondsLeft = 30;
+      const timerEl = document.getElementById("timer");
+      timerEl.textContent = `⏱️ ${secondsLeft}s`;
+
+      timer = setInterval(() => {
+        secondsLeft--;
+        timeTaken++;
+        timerEl.textContent = `⏱️ ${secondsLeft}s`;
+        if (secondsLeft <= 0) {
+          index++;
+          secondsLeft = 30;
+          showQuestion();
+        }
+      }, 1000);
+
       showQuestion();
     });
 }
 
-function showQuestion() {
-  if (currentQuestionIndex >= questions.length) {
-    localStorage.setItem("score", score);
-    localStorage.setItem("totalTime", totalTimeTaken);
-    window.location.href = "results.html";
+// Page 4: Handle results.html
+function handleResultsPage() {
+  const result = getItem("result");
+  if (!result) {
+    window.location.href = "chapters.html";
     return;
   }
 
-  const q = questions[currentQuestionIndex];
-  $("questionText").textContent = q.question;
-  const optionsDiv = $("options");
-  optionsDiv.innerHTML = "";
+  document.getElementById("summary").innerHTML = `
+    <p><strong>Chapter:</strong> ${result.chapter}</p>
+    <p><strong>Player:</strong> ${result.player}</p>
+    <p><strong>Score:</strong> ${result.score} / ${result.total}</p>
+    <p><strong>Time Taken:</strong> ${result.time}</p>
+    <p><strong>Date:</strong> ${result.date}</p>
+  `;
 
-  q.options.forEach((opt, idx) => {
-    const btn = document.createElement("button");
-    btn.textContent = opt;
-    btn.className = "option-btn";
-    btn.onclick = () => handleAnswer(idx, q.answer);
-    optionsDiv.appendChild(btn);
+  // Certificate link
+  document.getElementById("certificateBtn").addEventListener("click", () => {
+    alert("🎉 Certificate feature coming soon!");
   });
 
-  questionStartTime = Date.now();
-  startTimer(30, () => {
-    showFeedback(false);
-    nextQuestion();
+  // WhatsApp share
+  document.getElementById("whatsappBtn").addEventListener("click", () => {
+    const message = `I just played "${result.chapter}" on Server Room Lockdown!\nScore: ${result.score}/${result.total}\nTime: ${result.time}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
   });
-}
-
-function handleAnswer(selectedIdx, correctIdx) {
-  clearInterval(questionTimer);
-  const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
-  totalTimeTaken += timeTaken;
-  const correct = selectedIdx === correctIdx;
-  if (correct) score++;
-  showFeedback(correct);
-  setTimeout(nextQuestion, 1500);
-}
-
-function showFeedback(isCorrect) {
-  const feedback = $("feedback");
-  feedback.textContent = isCorrect ? "✔ Pass" : "✘ Fail";
-  feedback.className = isCorrect ? "pass" : "fail";
-  feedback.style.display = "block";
-  setTimeout(() => {
-    feedback.style.display = "none";
-  }, 1000);
-}
-
-function nextQuestion() {
-  currentQuestionIndex++;
-  showQuestion();
-}
-
-function showResults() {
-  const scoreVal = parseInt(localStorage.getItem("score")) || 0;
-  const totalTime = parseInt(localStorage.getItem("totalTime")) || 0;
-  const totalQuestions = 10;
-
-  $("summaryName").textContent = playerName;
-  $("summaryChapter").textContent = selectedChapterTitle;
-  $("summaryScore").textContent = `${scoreVal}/${totalQuestions}`;
-  $("summaryTime").textContent = `${totalTime}s`;
-
-  // Certificate download
-  $("downloadBtn").onclick = () => {
-    const cert = `
-    Certificate of Completion
-    --------------------------
-    Name: ${playerName}
-    Chapter: ${selectedChapterTitle}
-    Score: ${scoreVal}/${totalQuestions}
-    Time: ${totalTime}s
-    Date: ${new Date().toLocaleDateString()}
-    `;
-    const blob = new Blob([cert], { type: "text/plain" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "certificate.txt";
-    link.click();
-  };
-
-  // WhatsApp Share
-  $("shareBtn").onclick = () => {
-    const text = `I just completed '${selectedChapterTitle}' with a score of ${scoreVal}/${totalQuestions} in ${totalTime}s! 💥 #ServerRoomLockdown`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
-  };
 
   // Feedback
-  $("feedbackBtn").onclick = () => {
-    window.open("https://docs.google.com/forms/d/e/1FAIpQLSdu_fdi2qxup0D28h-bQXbrcpJJzm4AXZP9ByM57p9UXA06GQ/viewform?usp=header", "_blank");
-  };
+  document.getElementById("feedbackBtn").addEventListener("click", () => {
+    window.open("https://docs.google.com/forms/d/e/1FAIpQLSdu_fdi2qxup0D28h-bQXbrcpJJzm4AXZP9ByM57p9UXA06GQ/viewform", "_blank");
+  });
 
-  // Leaderboard Submission
-  const googleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSe4EwuIPz9MRWBLtGwxFm-r9tt38uHa8R33UwMXnu-XQnZY2A/formResponse";
+  // Return to chapters
+  document.getElementById("returnBtn").addEventListener("click", () => {
+    window.location.href = "chapters.html";
+  });
+
+  // Leaderboard submission
+  submitToLeaderboard(result);
+}
+
+// Google Form submission
+function submitToLeaderboard(data) {
+  const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSe4EwuIPz9MRWBLtGwxFm-r9tt38uHa8R33UwMXnu-XQnZY2A/formResponse';
+
   const formData = new FormData();
-  formData.append("entry.2060976916", playerName);
-  formData.append("entry.784134679", selectedChapterTitle);
-  formData.append("entry.222168494", `${scoreVal}/${totalQuestions}`);
-  formData.append("entry.1033246286", new Date().toLocaleDateString());
-  formData.append("entry.225669406", `${totalTime}s`);
+  formData.append('entry.2060976916', data.player); // Player Name
+  formData.append('entry.784134679', data.chapter); // Chapter
+  formData.append('entry.222168494', `${data.score}/${data.total}`); // Score
+  formData.append('entry.1033246286', data.date); // Date
+  formData.append('entry.225669406', data.time); // Time Taken
 
-  fetch(googleFormUrl, {
-    method: "POST",
-    mode: "no-cors",
-    body: formData,
+  fetch(formUrl, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: formData
   });
 }
 
-// Page-specific Initialization
-window.onload = () => {
-  switch (currentPage) {
-    case "start.html":
-    case "index.html":
-      $("startBtn").onclick = () => {
-        const name = $("playerNameInput").value.trim();
-        if (name) {
-          localStorage.setItem("playerName", name);
-          window.location.href = "chapters.html";
-        }
-      };
+// Routing logic for loading per page
+document.addEventListener("DOMContentLoaded", () => {
+  const page = document.body.getAttribute("data-page");
+  switch (page) {
+    case "start":
+      handleStartPage();
       break;
-
-    case "chapters.html":
-      if (!playerName) window.location.href = "start.html";
-      loadChapters();
+    case "chapters":
+      handleChaptersPage();
       break;
-
-    case "question.html":
-      if (!selectedChapterId || !playerName) window.location.href = "chapters.html";
-      loadQuestions();
+    case "question":
+      handleQuestionPage();
       break;
-
-    case "results.html":
-      showResults();
-      $("backBtn").onclick = () => {
-        window.location.href = "chapters.html";
-      };
+    case "results":
+      handleResultsPage();
       break;
   }
-};
+});
