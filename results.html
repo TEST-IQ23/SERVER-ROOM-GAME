@@ -5,25 +5,90 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mission Summary – Server Room Lockdown</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="script.js" defer></script>
 </head>
-<body class="results-page">
-  <div class="container">
-    <h2>Mission Complete</h2>
-    <p><strong>Player:</strong> <span id="playerName"></span></p>
-    <p><strong>Chapter:</strong> <span id="chapterName"></span></p>
-    <p><strong>Correct Answers:</strong> <span id="correctCount"></span> / <span id="totalQuestions"></span></p>
-    <p><strong>Wrong Answers:</strong> <span id="wrongCount"></span></p>
-    <p><strong>Total Time:</strong> <span id="timeTaken"></span></p>
+<body>
+  <div class="container results-page">
+    <h1>🎉 Mission Complete!</h1>
+    <p><strong>Agent:</strong> <span id="playerName"></span></p>
+    <p><strong>Chapter Completed:</strong> <span id="chapterTitle"></span></p>
+    <p><strong>Time Taken:</strong> <span id="timeTaken"></span> seconds</p>
+    <p><strong>Score:</strong> <span id="correctAnswers"></span> correct / <span id="wrongAnswers"></span> wrong</p>
 
-    <div class="button-group">
-      <button onclick="goToChapters()">Play Another Chapter</button>
-      <button onclick="downloadCertificate()">Download Certificate</button>
-      <a id="whatsappShareBtn" target="_blank">Share via WhatsApp</a>
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdu_fdi2qxup0D28h-bQXbrcpJJzm4AXZP9ByM57p9UXA06GQ/viewform?usp=header" target="_blank">
-        Submit Feedback
+    <div class="results-buttons">
+      <button onclick="goToChapters()">🔁 Play Another Chapter</button>
+      <button onclick="downloadCertificate()">📄 Download Certificate</button>
+      <a id="whatsappShare" href="#" target="_blank">
+        <button>📤 Share on WhatsApp</button>
+      </a>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdu_fdi2qxup0D28h-bQXbrcpJJzm4AXZP9ByM57p9UXA06GQ/viewform" target="_blank" class="btn">
+        📝 Give Feedback
       </a>
     </div>
   </div>
+
+  <script>
+    const playerName = localStorage.getItem('playerName') || 'Unknown Player';
+    const chapterTitle = localStorage.getItem('lastChapter') || localStorage.getItem('selectedChapterTitle') || 'Unknown Chapter';
+    const timeTaken = localStorage.getItem('timeTaken') || '0';
+    const correct = localStorage.getItem('correctAnswers') || localStorage.getItem('correctCount') || '0';
+    const wrong = localStorage.getItem('wrongAnswers') || localStorage.getItem('wrongCount') || '0';
+
+    document.getElementById('playerName').textContent = playerName;
+    document.getElementById('chapterTitle').textContent = chapterTitle;
+    document.getElementById('timeTaken').textContent = timeTaken;
+    document.getElementById('correctAnswers').textContent = correct;
+    document.getElementById('wrongAnswers').textContent = wrong;
+
+    const scoreText = `${correct} / 10`;
+    const datePlayed = new Date().toLocaleDateString();
+
+    // WhatsApp Share
+    const shareText = `🎮 ${playerName} just completed "${chapterTitle}" in Server Room Lockdown!\n✅ ${correct} correct | ❌ ${wrong} wrong | ⏱️ ${timeTaken}s\nPlay now: [YOUR_GAME_LINK]`;
+    document.getElementById('whatsappShare').href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+
+    function downloadCertificate() {
+      const certWindow = window.open('', '_blank');
+      certWindow.document.write(`
+        <html>
+          <head><title>Certificate</title></head>
+          <body style="text-align:center; font-family:sans-serif;">
+            <h1>🎓 Certificate of Completion</h1>
+            <p>This certifies that</p>
+            <h2>${playerName}</h2>
+            <p>successfully completed</p>
+            <h3>${chapterTitle}</h3>
+            <p>Score: ${correct}/10</p>
+            <p>Time: ${timeTaken} seconds</p>
+            <p>Date: ${new Date().toLocaleDateString()}</p>
+          </body>
+        </html>
+      `);
+      certWindow.print();
+    }
+
+    function goToChapters() {
+      window.location.href = "chapters.html";
+    }
+
+    function submitToLeaderboard() {
+      const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSe4EwuIPz9MRWBLtGwxFm-r9tt38uHa8R33UwMXnu-XQnZY2A/formResponse";
+
+      const formData = new FormData();
+      formData.append("entry.2060976916", playerName);
+      formData.append("entry.784134679", chapterTitle);
+      formData.append("entry.222168494", scoreText);
+      formData.append("entry.1033246286", datePlayed);
+      formData.append("entry.225669406", timeTaken);
+
+      fetch(formURL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData
+      }).then(() => console.log("Leaderboard submission sent"))
+        .catch(err => console.error("Submission error:", err));
+    }
+
+    submitToLeaderboard();
+  </script>
 </body>
 </html>
