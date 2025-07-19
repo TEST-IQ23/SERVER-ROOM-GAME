@@ -1,141 +1,115 @@
-// ========== Global State ==========
+// script.js
+
+// Global variables
 let playerName = localStorage.getItem("playerName") || "";
-let selectedChapter = JSON.parse(localStorage.getItem("selectedChapter")) || null;
+let selectedChapterId = localStorage.getItem("selectedChapterId");
+let selectedChapterTitle = localStorage.getItem("selectedChapterTitle");
+let questions = [];
 let currentQuestionIndex = 0;
-let correctCount = 0;
-let wrongCount = 0;
+let score = 0;
+let totalTimeTaken = 0;
 let questionTimer;
-let startTime;
+let questionStartTime;
 
-// ========== Start Page ==========
-function startGame() {
-  const nameInput = document.getElementById("playerNameInput");
-  const name = nameInput.value.trim();
+// Page Detection
+const currentPage = window.location.pathname.split("/").pop();
 
-  if (name) {
-    localStorage.setItem("playerName", name);
-    window.location.href = "chapters.html";
-  } else {
-    alert("Please enter your name before starting.");
-  }
+// Helper Functions
+function $(id) {
+  return document.getElementById(id);
 }
 
-// ========== Load Chapters ==========
+function startTimer(duration, onTimeout) {
+  let timeLeft = duration;
+  $("timer").textContent = `${timeLeft}s`;
+  questionTimer = setInterval(() => {
+    timeLeft--;
+    $("timer").textContent = `${timeLeft}s`;
+    if (timeLeft <= 0) {
+      clearInterval(questionTimer);
+      onTimeout();
+    }
+  }, 1000);
+}
+
 function loadChapters() {
-  const name = localStorage.getItem("playerName") || "Player";
-  document.getElementById("welcomePlayer").textContent = `Welcome, ${name}!`;
-
-  const chapterList = document.getElementById("chapterList");
-
-  chapters.forEach((chapter) => {
-    const btn = document.createElement("button");
-    btn.className = "chapter-btn";
-    btn.textContent = chapter.title;
-    btn.onclick = () => {
-      localStorage.setItem("selectedChapter", JSON.stringify(chapter));
-      window.location.href = "question.html";
-    };
-    chapterList.appendChild(btn);
-  });
+  fetch("chapters.js")
+    .then((res) => res.text())
+    .then((text) => {
+      eval(text); // loads `chapters` array
+      const chapterList = $("chapterList");
+      $("playerNameDisplay").textContent = playerName;
+      chapters.forEach((chapter) => {
+        const btn = document.createElement("button");
+        btn.textContent = chapter.title;
+        btn.className = "chapter-btn";
+        btn.onclick = () => {
+          localStorage.setItem("selectedChapterId", chapter.id);
+          localStorage.setItem("selectedChapterTitle", chapter.title);
+          window.location.href = "question.html";
+        };
+        chapterList.appendChild(btn);
+      });
+    });
 }
 
-// ========== Load Questions ==========
 function loadQuestions() {
-  selectedChapter = JSON.parse(localStorage.getItem("selectedChapter"));
-  playerName = localStorage.getItem("playerName");
-
-  if (!selectedChapter) {
-    window.location.href = "chapters.html";
-    return;
-  }
-
-  document.getElementById("chapterTitle").textContent = selectedChapter.title;
-  currentQuestionIndex = 0;
-  correctCount = 0;
-  wrongCount = 0;
-  startTime = Date.now();
-
-  showQuestion();
+  fetch("questions.js")
+    .then((res) => res.text())
+    .then((text) => {
+      eval(text); // loads `allQuestions` object
+      questions = allQuestions[selectedChapterId];
+      $("chapterTitle").textContent = selectedChapterTitle;
+      showQuestion();
+    });
 }
 
 function showQuestion() {
-  const questionArea = document.getElementById("questionArea");
-  const questionData = questions[selectedChapter.id][currentQuestionIndex];
-
-  if (!questionData) {
-    finishQuiz();
+  if (currentQuestionIndex >= questions.length) {
+    localStorage.setItem("score", score);
+    localStorage.setItem("totalTime", totalTimeTaken);
+    window.location.href = "results.html";
     return;
   }
 
-  questionArea.innerHTML = "";
-  clearTimeout(questionTimer);
+  const q = questions[currentQuestionIndex];
+  $("questionText").textContent = q.question;
+  const optionsDiv = $("options");
+  optionsDiv.innerHTML = "";
 
-  const questionBlock = document.createElement("div");
-  questionBlock.className = "question-block";
-
-  const questionText = document.createElement("p");
-  questionText.textContent = questionData.question;
-
-  const options = document.createElement("div");
-  options.className = "options";
-
-  questionData.options.forEach((option, index) => {
-    const label = document.createElement("label");
-    label.className = "option";
-
-    const input = document.createElement("input");
-    input.type = "radio";
-    input.name = "answer";
-    input.value = index;
-    input.onclick = () => checkAnswer(index, questionData.answer);
-
-    label.appendChild(input);
-    label.appendChild(document.createTextNode(option));
-    options.appendChild(label);
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.className = "option-btn";
+    btn.onclick = () => handleAnswer(idx, q.answer);
+    optionsDiv.appendChild(btn);
   });
 
-  const feedback = document.createElement("div");
-  feedback.id = "feedback";
-
-  const timer = document.getElementById("timer");
-  let secondsLeft = 30;
-  timer.textContent = `⏱️ ${secondsLeft}s`;
-
-  questionTimer = setInterval(() => {
-    secondsLeft--;
-    timer.textContent = `⏱️ ${secondsLeft}s`;
-
-    if (secondsLeft <= 0) {
-      clearInterval(questionTimer);
-      feedback.textContent = "⛔ Time's up!";
-      feedback.className = "fail";
-      wrongCount++;
-      setTimeout(nextQuestion, 1500);
-    }
-  }, 1000);
-
-  questionBlock.appendChild(questionText);
-  questionBlock.appendChild(options);
-  questionBlock.appendChild(feedback);
-  questionArea.appendChild(questionBlock);
+  questionStartTime = Date.now();
+  startTimer(30, () => {
+    showFeedback(false);
+    nextQuestion();
+  });
 }
 
-function checkAnswer(selected, correct) {
+function handleAnswer(selectedIdx, correctIdx) {
   clearInterval(questionTimer);
+  const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
+  totalTimeTaken += timeTaken;
+  const correct = selectedIdx === correctIdx;
+  if (correct) score++;
+  showFeedback(correct);
+  setTimeout(nextQuestion, 1500);
+}
 
-  const feedback = document.getElementById("feedback");
-
-  if (selected === correct) {
-    feedback.textContent = "✅ Correct!";
-    feedback.className = "pass";
-    correctCount++;
-  } else {
-    feedback.textContent = "❌ Incorrect!";
-    feedback.className = "fail";
-    wrongCount++;
-  }
-
-  setTimeout(nextQuestion, 1000);
+function showFeedback(isCorrect) {
+  const feedback = $("feedback");
+  feedback.textContent = isCorrect ? "✔ Pass" : "✘ Fail";
+  feedback.className = isCorrect ? "pass" : "fail";
+  feedback.style.display = "block";
+  setTimeout(() => {
+    feedback.style.display = "none";
+  }, 1000);
 }
 
 function nextQuestion() {
@@ -143,74 +117,90 @@ function nextQuestion() {
   showQuestion();
 }
 
-// ========== Finish and Results ==========
-function finishQuiz() {
-  const timeTaken = Math.round((Date.now() - startTime) / 1000);
+function showResults() {
+  const scoreVal = parseInt(localStorage.getItem("score")) || 0;
+  const totalTime = parseInt(localStorage.getItem("totalTime")) || 0;
+  const totalQuestions = 10;
 
-  const result = {
-    chapter: selectedChapter.title,
-    correct: correctCount,
-    wrong: wrongCount,
-    time: timeTaken,
-    name: playerName
+  $("summaryName").textContent = playerName;
+  $("summaryChapter").textContent = selectedChapterTitle;
+  $("summaryScore").textContent = `${scoreVal}/${totalQuestions}`;
+  $("summaryTime").textContent = `${totalTime}s`;
+
+  // Certificate download
+  $("downloadBtn").onclick = () => {
+    const cert = `
+    Certificate of Completion
+    --------------------------
+    Name: ${playerName}
+    Chapter: ${selectedChapterTitle}
+    Score: ${scoreVal}/${totalQuestions}
+    Time: ${totalTime}s
+    Date: ${new Date().toLocaleDateString()}
+    `;
+    const blob = new Blob([cert], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "certificate.txt";
+    link.click();
   };
 
-  localStorage.setItem("result", JSON.stringify(result));
-  window.location.href = "results.html";
-}
+  // WhatsApp Share
+  $("shareBtn").onclick = () => {
+    const text = `I just completed '${selectedChapterTitle}' with a score of ${scoreVal}/${totalQuestions} in ${totalTime}s! 💥 #ServerRoomLockdown`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+  };
 
-// ========== Results Page ==========
-function showResults() {
-  const result = JSON.parse(localStorage.getItem("result"));
+  // Feedback
+  $("feedbackBtn").onclick = () => {
+    window.open("https://docs.google.com/forms/d/e/1FAIpQLSdu_fdi2qxup0D28h-bQXbrcpJJzm4AXZP9ByM57p9UXA06GQ/viewform?usp=header", "_blank");
+  };
 
-  if (!result) {
-    window.location.href = "start.html";
-    return;
-  }
-
-  document.getElementById("resultChapter").textContent = `📘 Chapter: ${result.chapter}`;
-  document.getElementById("resultName").textContent = `👤 Name: ${result.name}`;
-  document.getElementById("resultTime").textContent = `⏱️ Time: ${result.time}s`;
-  document.getElementById("resultScore").textContent = `✅ Correct: ${result.correct} | ❌ Wrong: ${result.wrong}`;
-
-  // Submit to leaderboard
-  const scoreText = `✅ ${result.correct} | ❌ ${result.wrong}`;
-  const datePlayed = new Date().toLocaleDateString();
-  submitToLeaderboard(result.name, result.chapter, scoreText, datePlayed, `${result.time}s`);
-}
-
-// ========== Google Form Leaderboard (Final Version) ==========
-function submitToLeaderboard(playerName, chapter, scoreText, datePlayed, timeTaken) {
-  const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSe4EwuIPz9MRWBLtGwxFm-r9tt38uHa8R33UwMXnu-XQnZY2A/formResponse";
-
+  // Leaderboard Submission
+  const googleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSe4EwuIPz9MRWBLtGwxFm-r9tt38uHa8R33UwMXnu-XQnZY2A/formResponse";
   const formData = new FormData();
   formData.append("entry.2060976916", playerName);
-  formData.append("entry.784134679", chapter);
-  formData.append("entry.222168494", scoreText);
-  formData.append("entry.1033246286", datePlayed);
-  formData.append("entry.225669406", timeTaken);
+  formData.append("entry.784134679", selectedChapterTitle);
+  formData.append("entry.222168494", `${scoreVal}/${totalQuestions}`);
+  formData.append("entry.1033246286", new Date().toLocaleDateString());
+  formData.append("entry.225669406", `${totalTime}s`);
 
-  fetch(formURL, {
+  fetch(googleFormUrl, {
     method: "POST",
     mode: "no-cors",
-    body: formData
-  })
-    .then(() => console.log("Leaderboard submission sent"))
-    .catch((err) => console.error("Submission error:", err));
+    body: formData,
+  });
 }
 
-// ========== Utility Buttons ==========
-function goToChapters() {
-  window.location.href = "chapters.html";
-}
+// Page-specific Initialization
+window.onload = () => {
+  switch (currentPage) {
+    case "start.html":
+    case "index.html":
+      $("startBtn").onclick = () => {
+        const name = $("playerNameInput").value.trim();
+        if (name) {
+          localStorage.setItem("playerName", name);
+          window.location.href = "chapters.html";
+        }
+      };
+      break;
 
-function downloadCertificate() {
-  alert("🧾 Certificate feature coming soon!");
-}
+    case "chapters.html":
+      if (!playerName) window.location.href = "start.html";
+      loadChapters();
+      break;
 
-function shareOnWhatsApp() {
-  const result = JSON.parse(localStorage.getItem("result"));
-  const msg = `I just completed ${result.chapter} on Server Room Lockdown! ✅ ${result.correct} correct, ❌ ${result.wrong} wrong, in ${result.time}s!`;
-  const link = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-  window.open(link, "_blank");
-}
+    case "question.html":
+      if (!selectedChapterId || !playerName) window.location.href = "chapters.html";
+      loadQuestions();
+      break;
+
+    case "results.html":
+      showResults();
+      $("backBtn").onclick = () => {
+        window.location.href = "chapters.html";
+      };
+      break;
+  }
+};
