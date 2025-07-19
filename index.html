@@ -3,16 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Server Room Lockdown</title>
+  <title>Server Room Lockdown – Start</title>
   <link rel="stylesheet" href="style.css" />
-  <meta http-equiv="refresh" content="0; URL=start.html" />
 </head>
-<body>
-  <noscript>
-    <div class="container center">
-      <h1>🔒 Server Room Lockdown</h1>
-      <p>This game requires JavaScript to run. Please enable JavaScript in your browser.</p>
-    </div>
-  </noscript>
+<body class="start-page">
+  <div class="container">
+    <h1>🔐 Server Room Lockdown</h1>
+    <p class="intro">
+      Welcome, Agent! A critical breach has been detected in the Server Room. Your mission is to uncover the truth by completing all 10 chapters. 
+      Prepare to face timed questions and prove your skills.
+    </p>
+    
+    <label for="playerName">Enter Your Name to Begin:</label>
+    <input type="text" id="playerName" placeholder="Your Name" required />
+    <button onclick="startGame()">Start Mission</button>
+  </div>
+
+  <script>
+    function startGame() {
+      const nameInput = document.getElementById("playerName").value.trim();
+      if (nameInput === "") {
+        alert("Please enter your name to start.");
+        return;
+      }
+      localStorage.setItem("playerName", nameInput);
+      window.location.href = "chapters.html";
+    }
+  </script>
 </body>
 </html>
