@@ -3,86 +3,76 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Server Room Lockdown - Chapters</title>
+  <title>Chapters – Server Room Lockdown</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="game-container">
-    <h1>📘 Choose a Chapter</h1>
-    <div id="chapter-list"></div>
-    <div id="question-container" style="display: none;"></div>
-    <div id="navigation-buttons" style="display: none;">
-      <button id="back-to-chapters">🔙 Back to Chapters</button>
-    </div>
+  <div class="container">
+    <button id="backBtn" class="nav-btn" style="display: none;">⬅ Back to Chapters</button>
+    <h1 id="pageTitle">Chapters</h1>
+    <div id="chapterList" class="chapter-list"></div>
+    <div id="questionsContainer" class="questions-container" style="display: none;"></div>
   </div>
 
   <script src="chapters.js"></script>
   <script src="questions.js"></script>
   <script>
-    const chapterList = document.getElementById("chapter-list");
-    const questionContainer = document.getElementById("question-container");
-    const navigationButtons = document.getElementById("navigation-buttons");
+    const chapterList = document.getElementById('chapterList');
+    const questionsContainer = document.getElementById('questionsContainer');
+    const backBtn = document.getElementById('backBtn');
+    const pageTitle = document.getElementById('pageTitle');
 
-    function renderChapters() {
-      chapterList.innerHTML = '';
+    function loadChapters() {
       chapters.forEach(chapter => {
-        const btn = document.createElement("button");
-        btn.textContent = chapter.title;
-        btn.className = "chapter-button";
-        btn.onclick = () => showQuestions(chapter.id);
-        chapterList.appendChild(btn);
+        const chapterBtn = document.createElement('button');
+        chapterBtn.textContent = chapter.title;
+        chapterBtn.className = "chapter-btn";
+        chapterBtn.onclick = () => loadQuestions(chapter.id, chapter.title);
+        chapterList.appendChild(chapterBtn);
       });
     }
 
-    function showQuestions(chapterId) {
+    function loadQuestions(chapterId, title) {
       chapterList.style.display = "none";
-      questionContainer.innerHTML = '';
-      questionContainer.style.display = "block";
-      navigationButtons.style.display = "block";
+      backBtn.style.display = "inline-block";
+      questionsContainer.style.display = "block";
+      pageTitle.textContent = title;
 
-      const chapterQuestions = questions[chapterId] || [];
-      if (chapterQuestions.length === 0) {
-        questionContainer.innerHTML = "<p>No questions available for this chapter.</p>";
+      const chapterQuestions = questions[chapterId];
+      questionsContainer.innerHTML = "";
+
+      if (!chapterQuestions) {
+        questionsContainer.innerHTML = "<p>No questions found for this chapter.</p>";
         return;
       }
 
       chapterQuestions.forEach((q, index) => {
         const block = document.createElement("div");
         block.className = "question-block";
+        block.innerHTML = `<p>Q${index + 1}: ${q.q}</p>`;
 
-        const qText = document.createElement("p");
-        qText.textContent = `${index + 1}. ${q.q}`;
-        block.appendChild(qText);
+        q.options.forEach(opt => {
+          const label = document.createElement("label");
+          label.innerHTML = `
+            <input type="radio" name="q${chapterId}_${index}" value="${opt}">
+            ${opt}
+          `;
+          block.appendChild(label);
+          block.appendChild(document.createElement("br"));
+        });
 
-        if (q.type === "MCQ") {
-          q.options.forEach(option => {
-            const label = document.createElement("label");
-            label.innerHTML = `
-              <input type="radio" name="question-${chapterId}-${index}" value="${option}">
-              ${option}
-            `;
-            block.appendChild(label);
-            block.appendChild(document.createElement("br"));
-          });
-        } else if (q.type === "text") {
-          const input = document.createElement("input");
-          input.type = "text";
-          input.name = `question-${chapterId}-${index}`;
-          input.placeholder = "Your answer";
-          block.appendChild(input);
-        }
-
-        questionContainer.appendChild(block);
+        questionsContainer.appendChild(block);
       });
     }
 
-    document.getElementById("back-to-chapters").onclick = () => {
-      questionContainer.style.display = "none";
-      navigationButtons.style.display = "none";
+    backBtn.onclick = () => {
       chapterList.style.display = "block";
+      backBtn.style.display = "none";
+      questionsContainer.style.display = "none";
+      pageTitle.textContent = "Chapters";
     };
 
-    renderChapters();
+    loadChapters();
   </script>
 </body>
 </html>
