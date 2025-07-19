@@ -1,99 +1,212 @@
-let currentChapterIndex = null;
+// ========= Global State =========
+let playerName = localStorage.getItem("playerName") || "";
+let selectedChapter = JSON.parse(localStorage.getItem("selectedChapter")) || null;
+let currentQuestionIndex = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let questionTimer;
+let startTime;
 
-// Load chapters on page load
-document.addEventListener("DOMContentLoaded", () => {
-  const chaptersList = document.getElementById("chaptersList");
-  const playerNameSpan = document.getElementById("playerName");
-  const playerName = localStorage.getItem("playerName") || "Agent";
-  if (playerNameSpan) {
-    playerNameSpan.textContent = playerName;
-  }
+// ========= Start Page =========
+function startGame() {
+  const nameInput = document.getElementById("playerNameInput");
+  const name = nameInput.value.trim();
 
-  // Display list of chapters
-  if (typeof chapters !== "undefined" && chapters.length > 0) {
-    chapters.forEach((chapter, index) => {
-      const chapterButton = document.createElement("button");
-      chapterButton.textContent = `Chapter ${index + 1}: ${chapter.title}`;
-      chapterButton.className = "chapter-button";
-      chapterButton.onclick = () => loadChapter(index);
-      chaptersList.appendChild(chapterButton);
-    });
+  if (name) {
+    localStorage.setItem("playerName", name);
+    window.location.href = "chapters.html";
   } else {
-    chaptersList.innerHTML = "<p>⚠️ No chapters available.</p>";
+    alert("Please enter your name before starting.");
   }
-});
-
-// Load a specific chapter
-function loadChapter(index) {
-  currentChapterIndex = index;
-  const chapter = chapters[index];
-  const container = document.getElementById("chaptersList");
-  container.innerHTML = ""; // Clear
-
-  // Chapter Title
-  const title = document.createElement("h2");
-  title.textContent = `Chapter ${index + 1}: ${chapter.title}`;
-  container.appendChild(title);
-
-  // Questions
-  chapter.questions.forEach((q, qIndex) => {
-    const block = document.createElement("div");
-    block.className = "question-block";
-
-    const questionText = document.createElement("p");
-    questionText.textContent = `${qIndex + 1}. ${q.question}`;
-    block.appendChild(questionText);
-
-    if (q.type === "MCQ") {
-      q.options.forEach(option => {
-        const label = document.createElement("label");
-        const input = document.createElement("input");
-        input.type = "radio";
-        input.name = `q${index}_${qIndex}`;
-        input.value = option;
-        label.appendChild(input);
-        label.append(` ${option}`);
-        block.appendChild(label);
-        block.appendChild(document.createElement("br"));
-      });
-    } else if (q.type === "text") {
-      const input = document.createElement("input");
-      input.type = "text";
-      input.name = `q${index}_${qIndex}`;
-      block.appendChild(input);
-    }
-
-    container.appendChild(block);
-  });
-
-  // Navigation Buttons
-  const navWrapper = document.createElement("div");
-  navWrapper.className = "navigation-buttons";
-
-  if (index > 0) {
-    const backBtn = document.createElement("button");
-    backBtn.textContent = "🔙 Back to Chapters";
-    backBtn.className = "back-button";
-    backBtn.onclick = () => showChapterList();
-    navWrapper.appendChild(backBtn);
-  }
-
-  if (index < chapters.length - 1) {
-    const nextBtn = document.createElement("button");
-    nextBtn.textContent = "➡️ Next Chapter";
-    nextBtn.className = "next-button";
-    nextBtn.onclick = () => loadChapter(index + 1);
-    navWrapper.appendChild(nextBtn);
-  } else {
-    const doneMsg = document.createElement("p");
-    doneMsg.textContent = "🎉 You've reached the final chapter!";
-    navWrapper.appendChild(doneMsg);
-  }
-
-  container.appendChild(navWrapper);
 }
 
-// Show all chapters again
-function showChapterList() {
-  location.reload(); // Reload page to show chapter list
+// ========= Load Chapters =========
+function loadChapters() {
+  const name = localStorage.getItem("playerName") || "Player";
+  document.getElementById("welcomePlayer").textContent = `Welcome, ${name}!`;
+
+  const chapterList = document.getElementById("chapterList");
+
+  chapters.forEach((chapter) => {
+    const btn = document.createElement("button");
+    btn.className = "chapter-btn";
+    btn.textContent = chapter.title;
+    btn.onclick = () => {
+      localStorage.setItem("selectedChapter", JSON.stringify(chapter));
+      window.location.href = "question.html";
+    };
+    chapterList.appendChild(btn);
+  });
+}
+
+// ========= Load Questions =========
+function loadQuestions() {
+  selectedChapter = JSON.parse(localStorage.getItem("selectedChapter"));
+  playerName = localStorage.getItem("playerName");
+
+  if (!selectedChapter) {
+    window.location.href = "chapters.html";
+    return;
+  }
+
+  document.getElementById("chapterTitle").textContent = selectedChapter.title;
+  currentQuestionIndex = 0;
+  correctCount = 0;
+  wrongCount = 0;
+  startTime = Date.now();
+
+  showQuestion();
+}
+
+function showQuestion() {
+  const questionArea = document.getElementById("questionArea");
+  const questionData = questions[selectedChapter.id][currentQuestionIndex];
+
+  if (!questionData) {
+    finishQuiz();
+    return;
+  }
+
+  // Reset area
+  questionArea.innerHTML = "";
+  clearTimeout(questionTimer);
+
+  const questionBlock = document.createElement("div");
+  questionBlock.className = "question-block";
+
+  const questionText = document.createElement("p");
+  questionText.textContent = questionData.question;
+
+  const options = document.createElement("div");
+  options.className = "options";
+
+  questionData.options.forEach((option, index) => {
+    const label = document.createElement("label");
+    label.className = "option";
+
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = "answer";
+    input.value = index;
+    input.onclick = () => checkAnswer(index, questionData.answer);
+
+    label.appendChild(input);
+    label.appendChild(document.createTextNode(option));
+    options.appendChild(label);
+  });
+
+  const feedback = document.createElement("div");
+  feedback.id = "feedback";
+
+  const timer = document.getElementById("timer");
+  let secondsLeft = 30;
+  timer.textContent = `⏱️ ${secondsLeft}s`;
+
+  questionTimer = setInterval(() => {
+    secondsLeft--;
+    timer.textContent = `⏱️ ${secondsLeft}s`;
+
+    if (secondsLeft <= 0) {
+      clearInterval(questionTimer);
+      feedback.textContent = "⛔ Time's up!";
+      feedback.className = "fail";
+      wrongCount++;
+      setTimeout(nextQuestion, 1500);
+    }
+  }, 1000);
+
+  questionBlock.appendChild(questionText);
+  questionBlock.appendChild(options);
+  questionBlock.appendChild(feedback);
+  questionArea.appendChild(questionBlock);
+}
+
+function checkAnswer(selected, correct) {
+  clearInterval(questionTimer);
+
+  const feedback = document.getElementById("feedback");
+
+  if (selected === correct) {
+    feedback.textContent = "✅ Correct!";
+    feedback.className = "pass";
+    correctCount++;
+  } else {
+    feedback.textContent = "❌ Incorrect!";
+    feedback.className = "fail";
+    wrongCount++;
+  }
+
+  setTimeout(nextQuestion, 1000);
+}
+
+function nextQuestion() {
+  currentQuestionIndex++;
+  showQuestion();
+}
+
+// ========= Finish and Results =========
+function finishQuiz() {
+  const timeTaken = Math.round((Date.now() - startTime) / 1000);
+
+  localStorage.setItem("result", JSON.stringify({
+    chapter: selectedChapter.title,
+    correct: correctCount,
+    wrong: wrongCount,
+    time: timeTaken,
+    name: playerName
+  }));
+
+  window.location.href = "results.html";
+}
+
+// ========= Results Page =========
+function showResults() {
+  const result = JSON.parse(localStorage.getItem("result"));
+
+  if (!result) {
+    window.location.href = "start.html";
+    return;
+  }
+
+  document.getElementById("resultChapter").textContent = `📘 Chapter: ${result.chapter}`;
+  document.getElementById("resultName").textContent = `👤 Name: ${result.name}`;
+  document.getElementById("resultTime").textContent = `⏱️ Time: ${result.time}s`;
+  document.getElementById("resultScore").textContent = `✅ Correct: ${result.correct} | ❌ Wrong: ${result.wrong}`;
+
+  // Submit to leaderboard
+  submitToGoogleForm(result);
+}
+
+// ========= Google Form Leaderboard =========
+function submitToGoogleForm(data) {
+  const formURL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse";
+
+  const formData = new FormData();
+  formData.append("entry.YOUR_NAME_ID", data.name);
+  formData.append("entry.YOUR_CHAPTER_ID", data.chapter);
+  formData.append("entry.YOUR_TIME_ID", data.time);
+  formData.append("entry.YOUR_CORRECT_ID", data.correct);
+  formData.append("entry.YOUR_WRONG_ID", data.wrong);
+
+  fetch(formURL, {
+    method: "POST",
+    mode: "no-cors",
+    body: formData
+  });
+}
+
+// ========= Utility Buttons =========
+function goToChapters() {
+  window.location.href = "chapters.html";
+}
+
+function downloadCertificate() {
+  alert("🧾 Certificate feature coming soon!");
+}
+
+function shareOnWhatsApp() {
+  const result = JSON.parse(localStorage.getItem("result"));
+  const msg = `I just completed ${result.chapter} on Server Room Lockdown! ✅ ${result.correct} correct, ❌ ${result.wrong} wrong, in ${result.time}s!`;
+  const link = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(link, "_blank");
 }
