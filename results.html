@@ -3,71 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Results - Server Room Lockdown</title>
+  <title>Server Room Lockdown - Results</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h2>🎉 Mission Complete!</h2>
-
+  <div class="container results-page">
+    <h1>🎉 Mission Complete!</h1>
     <p><strong>Player:</strong> <span id="playerName"></span></p>
-    <p><strong>Chapter:</strong> <span id="chapterTitle"></span></p>
-    <p><strong>Score:</strong> ✅ <span id="score"></span> | ❌ <span id="fail"></span></p>
-    <p><strong>Completed on:</strong> <span id="date"></span></p>
+    <p><strong>Chapter:</strong> <span id="chapterPlayed"></span></p>
+    <p><strong>Time Taken:</strong> <span id="timeTaken"></span> seconds</p>
+    <p><strong>Score:</strong> <span id="score"></span> correct / <span id="wrong"></span> wrong</p>
 
-    <div class="button-group">
+    <div class="results-buttons">
       <button onclick="goToChapters()">🔁 Play Another Chapter</button>
-      <button onclick="downloadCertificate()">🎓 Download Certificate</button>
-      <button onclick="shareWhatsApp()">📤 Share via WhatsApp</button>
-      <button onclick="submitLeaderboard()">📊 Submit to Leaderboard</button>
-      <a href="https://forms.gle/YOUR_FEEDBACK_FORM" target="_blank"><button>✍️ Submit Feedback</button></a>
+      <button onclick="downloadCertificate()">📄 Download Certificate</button>
+      <a id="whatsappShare" href="#" target="_blank">
+        <button>📤 Share on WhatsApp</button>
+      </a>
+      <a href="https://forms.gle/YOUR_GOOGLE_FORM_LINK" target="_blank">
+        <button>📝 Submit Feedback</button>
+      </a>
     </div>
   </div>
 
   <script>
-    const playerName = localStorage.getItem("playerName") || "Player";
-    const chapterId = localStorage.getItem("selectedChapter");
-    const chapterTitle = localStorage.getItem("selectedChapterTitle") || "Unknown";
-    const score = localStorage.getItem(`chapter_${chapterId}_score`) || 0;
-    const fail = localStorage.getItem(`chapter_${chapterId}_fail`) || 0;
-    const date = localStorage.getItem(`chapter_${chapterId}_date`) || new Date().toLocaleString();
+    const playerName = localStorage.getItem('playerName') || 'Unknown Player';
+    const chapter = localStorage.getItem('selectedChapterTitle') || 'Unknown Chapter';
+    const time = localStorage.getItem('timeTaken') || '0';
+    const correct = localStorage.getItem('correctCount') || '0';
+    const wrong = localStorage.getItem('wrongCount') || '0';
 
-    document.getElementById("playerName").textContent = playerName;
-    document.getElementById("chapterTitle").textContent = chapterTitle;
-    document.getElementById("score").textContent = score;
-    document.getElementById("fail").textContent = fail;
-    document.getElementById("date").textContent = date;
+    document.getElementById('playerName').textContent = playerName;
+    document.getElementById('chapterPlayed').textContent = chapter;
+    document.getElementById('timeTaken').textContent = time;
+    document.getElementById('score').textContent = correct;
+    document.getElementById('wrong').textContent = wrong;
 
-    function goToChapters() {
-      window.location.href = "chapters.html";
-    }
+    // WhatsApp share link
+    const message = `I just completed "${chapter}" in Server Room Lockdown! ✅ Score: ${correct} / ❌ ${wrong} in ⏱️ ${time}s`;
+    const shareURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    document.getElementById('whatsappShare').href = shareURL;
 
+    // Certificate download (basic implementation)
     function downloadCertificate() {
-      const text = `Certificate of Completion\n\nThis certifies that ${playerName} successfully completed ${chapterTitle} on ${date}.\nScore: ${score} correct, ${fail} incorrect.`;
+      const text = `
+        🎓 Certificate of Completion
+        This certifies that ${playerName}
+        completed "${chapter}"
+        Score: ${correct} correct, ${wrong} wrong
+        Time Taken: ${time}s
+      `;
       const blob = new Blob([text], { type: "text/plain" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = `${playerName}_${chapterTitle}_Certificate.txt`;
+      link.download = `${playerName}_certificate.txt`;
       link.click();
     }
 
-    function shareWhatsApp() {
-      const message = `I just completed '${chapterTitle}' in the Server Room Lockdown game! ✅ Score: ${score}, ❌ Fail: ${fail}. Try it now: https://test-iq23.github.io/SERVER-ROOM-GAME/`;
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, "_blank");
+    function goToChapters() {
+      window.location.href = 'chapters.html';
     }
 
-    function submitLeaderboard() {
-      const formURL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform";
-      const params = new URLSearchParams({
-        "entry.1234567890": playerName, // Replace with your actual Google Form entry IDs
-        "entry.2345678901": chapterTitle,
-        "entry.3456789012": score,
-        "entry.4567890123": fail,
-        "entry.5678901234": date
-      });
-      window.open(`${formURL}?${params.toString()}`, "_blank");
-    }
+    // Submit to Google Form leaderboard
+    const formURL = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse';
+    const formData = new FormData();
+    formData.append('entry.1234567890', playerName); // Name
+    formData.append('entry.2345678901', chapter);    // Chapter
+    formData.append('entry.3456789012', time);       // Time
+    formData.append('entry.4567890123', correct);    // Correct
+    formData.append('entry.5678901234', wrong);      // Wrong
+
+    fetch(formURL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: formData
+    });
   </script>
 </body>
 </html>
