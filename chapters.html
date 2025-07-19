@@ -3,76 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chapters – Server Room Lockdown</title>
+  <title>Server Room Lockdown - Choose Chapter</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <button id="backBtn" class="nav-btn" style="display: none;">⬅ Back to Chapters</button>
-    <h1 id="pageTitle">Chapters</h1>
+    <h1>Choose a Chapter</h1>
+    <p id="playerNameDisplay"></p>
+
     <div id="chapterList" class="chapter-list"></div>
-    <div id="questionsContainer" class="questions-container" style="display: none;"></div>
+
+    <button onclick="goBack()">⬅ Back to Start</button>
   </div>
 
-  <script src="chapters.js"></script>
-  <script src="questions.js"></script>
   <script>
-    const chapterList = document.getElementById('chapterList');
-    const questionsContainer = document.getElementById('questionsContainer');
-    const backBtn = document.getElementById('backBtn');
-    const pageTitle = document.getElementById('pageTitle');
+    const chapters = [
+      { id: 1, title: "Chapter 1: Power Surge" },
+      { id: 2, title: "Chapter 2: Firewall Frenzy" },
+      { id: 3, title: "Chapter 3: Protocol Puzzle" },
+      { id: 4, title: "Chapter 4: Backup Breakdown" },
+      { id: 5, title: "Chapter 5: Network Nexus" },
+      { id: 6, title: "Chapter 6: Cache Clash" },
+      { id: 7, title: "Chapter 7: Malware Maze" },
+      { id: 8, title: "Chapter 8: Encryption Escape" },
+      { id: 9, title: "Chapter 9: Data Drift" },
+      { id: 10, title: "Chapter 10: Root Access Race" },
+    ];
 
-    function loadChapters() {
-      chapters.forEach(chapter => {
-        const chapterBtn = document.createElement('button');
-        chapterBtn.textContent = chapter.title;
-        chapterBtn.className = "chapter-btn";
-        chapterBtn.onclick = () => loadQuestions(chapter.id, chapter.title);
-        chapterList.appendChild(chapterBtn);
-      });
+    const playerName = localStorage.getItem("playerName");
+    document.getElementById("playerNameDisplay").textContent = `Welcome, ${playerName || 'Player'}!`;
+
+    const chapterList = document.getElementById("chapterList");
+
+    chapters.forEach(chapter => {
+      const button = document.createElement("button");
+      button.textContent = chapter.title;
+      button.classList.add("chapter-button");
+      button.onclick = () => {
+        localStorage.setItem("selectedChapter", chapter.id);
+        localStorage.setItem("selectedChapterTitle", chapter.title);
+        window.location.href = "questions.html";
+      };
+      chapterList.appendChild(button);
+    });
+
+    function goBack() {
+      window.location.href = "start.html";
     }
-
-    function loadQuestions(chapterId, title) {
-      chapterList.style.display = "none";
-      backBtn.style.display = "inline-block";
-      questionsContainer.style.display = "block";
-      pageTitle.textContent = title;
-
-      const chapterQuestions = questions[chapterId];
-      questionsContainer.innerHTML = "";
-
-      if (!chapterQuestions) {
-        questionsContainer.innerHTML = "<p>No questions found for this chapter.</p>";
-        return;
-      }
-
-      chapterQuestions.forEach((q, index) => {
-        const block = document.createElement("div");
-        block.className = "question-block";
-        block.innerHTML = `<p>Q${index + 1}: ${q.q}</p>`;
-
-        q.options.forEach(opt => {
-          const label = document.createElement("label");
-          label.innerHTML = `
-            <input type="radio" name="q${chapterId}_${index}" value="${opt}">
-            ${opt}
-          `;
-          block.appendChild(label);
-          block.appendChild(document.createElement("br"));
-        });
-
-        questionsContainer.appendChild(block);
-      });
-    }
-
-    backBtn.onclick = () => {
-      chapterList.style.display = "block";
-      backBtn.style.display = "none";
-      questionsContainer.style.display = "none";
-      pageTitle.textContent = "Chapters";
-    };
-
-    loadChapters();
   </script>
 </body>
 </html>
