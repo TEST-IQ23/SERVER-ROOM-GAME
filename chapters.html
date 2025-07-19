@@ -3,43 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Server Room Lockdown - Chapters</title>
+  <title>Select Chapter – Server Room Lockdown</title>
   <link rel="stylesheet" href="style.css" />
-  <script defer src="chapters.js"></script>
-  <script defer src="script.js"></script>
+  <script src="chapters.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
-<body>
-  <div class="container chapter-page">
-    <h1 id="greeting">Welcome, Agent!</h1>
-    <p>Select a chapter below to begin your mission:</p>
-
-    <div id="chaptersContainer" class="chapters-grid">
-      <!-- Chapters will be loaded here dynamically -->
-    </div>
+<body class="chapters-page">
+  <div class="container">
+    <h2 id="welcomeMessage"></h2>
+    <p>Select a chapter to begin your mission:</p>
+    <div id="chaptersList" class="chapter-grid"></div>
   </div>
-
-  <script>
-    // Display player name from localStorage
-    const playerName = localStorage.getItem('playerName') || 'Agent';
-    document.getElementById('greeting').textContent = `Welcome, ${playerName}!`;
-
-    // Load chapters from chapters.js
-    function loadChapters() {
-      const container = document.getElementById('chaptersContainer');
-      chapters.forEach((chapter, index) => {
-        const button = document.createElement('button');
-        button.className = 'chapter-button';
-        button.textContent = chapter.title;
-        button.onclick = () => {
-          localStorage.setItem('selectedChapterId', chapter.id);
-          localStorage.setItem('selectedChapterTitle', chapter.title);
-          window.location.href = 'question.html';
-        };
-        container.appendChild(button);
-      });
-    }
-
-    loadChapters();
-  </script>
 </body>
 </html>
