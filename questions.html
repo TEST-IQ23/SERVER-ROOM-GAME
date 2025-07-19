@@ -6,19 +6,104 @@
   <title>Mission Questions – Server Room Lockdown</title>
   <link rel="stylesheet" href="style.css" />
   <script src="questions.js" defer></script>
-  <script src="script.js" defer></script>
 </head>
 <body class="question-page">
   <div class="container">
-    <h2 id="chapterTitle"></h2>
-    <div id="timer" class="timer">Time left: <span id="timeLeft">30</span>s</div>
-    
-    <div id="questionContainer" class="question-box">
-      <p id="questionText"></p>
-      <div id="options" class="options-grid"></div>
-    </div>
+    <header>
+      <h2 id="chapterTitle">Loading...</h2>
+      <div id="timer" class="timer">⏱️ 30s</div>
+    </header>
 
-    <div id="feedback" class="feedback"></div>
+    <main>
+      <div id="questionContainer" class="question-box">
+        <p id="questionText" class="question-text">Loading question...</p>
+        <div id="options" class="options-grid"></div>
+      </div>
+      <div id="feedback" class="feedback"></div>
+    </main>
   </div>
+
+  <script>
+    const chapterId = localStorage.getItem('selectedChapterId');
+    const chapterTitle = localStorage.getItem('selectedChapterTitle');
+    document.getElementById('chapterTitle').textContent = `Chapter: ${chapterTitle}`;
+
+    const allQuestions = questions[chapterId];
+    let currentQuestion = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let startTime = Date.now();
+    let timer;
+
+    function showQuestion() {
+      const q = allQuestions[currentQuestion];
+      const questionEl = document.getElementById('questionText');
+      const optionsEl = document.getElementById('options');
+      const feedback = document.getElementById('feedback');
+
+      questionEl.textContent = q.question;
+      optionsEl.innerHTML = '';
+      feedback.textContent = '';
+
+      q.options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.className = 'option-button';
+        btn.onclick = () => {
+          clearInterval(timer);
+          const isCorrect = opt === q.answer;
+          feedback.textContent = isCorrect ? '✅ Pass' : '❌ Fail';
+          isCorrect ? correctCount++ : wrongCount++;
+          setTimeout(() => {
+            currentQuestion++;
+            if (currentQuestion < allQuestions.length) {
+              showQuestion();
+              startTimer();
+            } else {
+              endQuiz();
+            }
+          }, 1000);
+        };
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function startTimer() {
+      let timeLeft = 30;
+      const timerDisplay = document.getElementById('timer');
+      timerDisplay.textContent = `⏱️ ${timeLeft}s`;
+
+      timer = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `⏱️ ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          document.getElementById('feedback').textContent = '⏰ Time Up! Fail';
+          wrongCount++;
+          setTimeout(() => {
+            currentQuestion++;
+            if (currentQuestion < allQuestions.length) {
+              showQuestion();
+              startTimer();
+            } else {
+              endQuiz();
+            }
+          }, 1000);
+        }
+      }, 1000);
+    }
+
+    function endQuiz() {
+      const totalTime = Math.floor((Date.now() - startTime) / 1000);
+      localStorage.setItem('correctCount', correctCount);
+      localStorage.setItem('wrongCount', wrongCount);
+      localStorage.setItem('timeTaken', totalTime);
+      window.location.href = 'results.html';
+    }
+
+    // Start the quiz
+    showQuestion();
+    startTimer();
+  </script>
 </body>
 </html>
