@@ -1,15 +1,15 @@
-// Load chapters from chapters.js and display them
+let currentChapterIndex = null;
+
+// Load chapters on page load
 document.addEventListener("DOMContentLoaded", () => {
   const chaptersList = document.getElementById("chaptersList");
   const playerNameSpan = document.getElementById("playerName");
-
-  // Get player name from localStorage
   const playerName = localStorage.getItem("playerName") || "Agent";
   if (playerNameSpan) {
     playerNameSpan.textContent = playerName;
   }
 
-  // Load chapters from chapters.js (Code 2)
+  // Display list of chapters
   if (typeof chapters !== "undefined" && chapters.length > 0) {
     chapters.forEach((chapter, index) => {
       const chapterButton = document.createElement("button");
@@ -23,50 +23,77 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Load selected chapter and display only its questions
-function loadChapter(chapterIndex) {
-  const chapter = chapters[chapterIndex];
-  const chaptersList = document.getElementById("chaptersList");
-  chaptersList.innerHTML = ""; // Clear previous list
+// Load a specific chapter
+function loadChapter(index) {
+  currentChapterIndex = index;
+  const chapter = chapters[index];
+  const container = document.getElementById("chaptersList");
+  container.innerHTML = ""; // Clear
 
-  const backBtn = document.createElement("button");
-  backBtn.textContent = "🔙 Back to Chapters";
-  backBtn.className = "back-button";
-  backBtn.onclick = () => location.reload();
-  chaptersList.appendChild(backBtn);
+  // Chapter Title
+  const title = document.createElement("h2");
+  title.textContent = `Chapter ${index + 1}: ${chapter.title}`;
+  container.appendChild(title);
 
-  const chapterTitle = document.createElement("h2");
-  chapterTitle.textContent = chapter.title;
-  chaptersList.appendChild(chapterTitle);
-
+  // Questions
   chapter.questions.forEach((q, qIndex) => {
-    const questionBlock = document.createElement("div");
-    questionBlock.className = "question-block";
+    const block = document.createElement("div");
+    block.className = "question-block";
 
     const questionText = document.createElement("p");
     questionText.textContent = `${qIndex + 1}. ${q.question}`;
-    questionBlock.appendChild(questionText);
+    block.appendChild(questionText);
 
     if (q.type === "MCQ") {
-      q.options.forEach((opt, optIndex) => {
+      q.options.forEach(option => {
         const label = document.createElement("label");
         const input = document.createElement("input");
         input.type = "radio";
-        input.name = `q${chapterIndex}_${qIndex}`;
-        input.value = opt;
-
+        input.name = `q${index}_${qIndex}`;
+        input.value = option;
         label.appendChild(input);
-        label.append(` ${opt}`);
-        questionBlock.appendChild(label);
-        questionBlock.appendChild(document.createElement("br"));
+        label.append(` ${option}`);
+        block.appendChild(label);
+        block.appendChild(document.createElement("br"));
       });
     } else if (q.type === "text") {
       const input = document.createElement("input");
       input.type = "text";
-      input.name = `q${chapterIndex}_${qIndex}`;
-      questionBlock.appendChild(input);
+      input.name = `q${index}_${qIndex}`;
+      block.appendChild(input);
     }
 
-    chaptersList.appendChild(questionBlock);
+    container.appendChild(block);
   });
+
+  // Navigation Buttons
+  const navWrapper = document.createElement("div");
+  navWrapper.className = "navigation-buttons";
+
+  if (index > 0) {
+    const backBtn = document.createElement("button");
+    backBtn.textContent = "🔙 Back to Chapters";
+    backBtn.className = "back-button";
+    backBtn.onclick = () => showChapterList();
+    navWrapper.appendChild(backBtn);
+  }
+
+  if (index < chapters.length - 1) {
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "➡️ Next Chapter";
+    nextBtn.className = "next-button";
+    nextBtn.onclick = () => loadChapter(index + 1);
+    navWrapper.appendChild(nextBtn);
+  } else {
+    const doneMsg = document.createElement("p");
+    doneMsg.textContent = "🎉 You've reached the final chapter!";
+    navWrapper.appendChild(doneMsg);
+  }
+
+  container.appendChild(navWrapper);
+}
+
+// Show all chapters again
+function showChapterList() {
+  location.reload(); // Reload page to show chapter list
 }
