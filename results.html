@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Server Room Lockdown - Results</title>
+  <title>Results - Server Room Lockdown</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container results-page">
     <h1>🎉 Mission Complete!</h1>
-    <p><strong>Player:</strong> <span id="playerName"></span></p>
-    <p><strong>Chapter:</strong> <span id="chapterPlayed"></span></p>
+    <p><strong>Agent:</strong> <span id="playerName"></span></p>
+    <p><strong>Chapter Completed:</strong> <span id="chapterTitle"></span></p>
     <p><strong>Time Taken:</strong> <span id="timeTaken"></span> seconds</p>
-    <p><strong>Score:</strong> <span id="score"></span> correct / <span id="wrong"></span> wrong</p>
+    <p><strong>Score:</strong> <span id="correctAnswers"></span> correct / <span id="wrongAnswers"></span> wrong</p>
 
     <div class="results-buttons">
       <button onclick="goToChapters()">🔁 Play Another Chapter</button>
@@ -20,64 +20,76 @@
       <a id="whatsappShare" href="#" target="_blank">
         <button>📤 Share on WhatsApp</button>
       </a>
-      <a href="https://forms.gle/YOUR_GOOGLE_FORM_LINK" target="_blank">
+      <a href="https://forms.gle/YOUR_FEEDBACK_FORM" target="_blank">
         <button>📝 Submit Feedback</button>
       </a>
     </div>
   </div>
 
   <script>
+    // ==== Load result data ====
     const playerName = localStorage.getItem('playerName') || 'Unknown Player';
-    const chapter = localStorage.getItem('selectedChapterTitle') || 'Unknown Chapter';
-    const time = localStorage.getItem('timeTaken') || '0';
-    const correct = localStorage.getItem('correctCount') || '0';
-    const wrong = localStorage.getItem('wrongCount') || '0';
+    const chapterTitle = localStorage.getItem('lastChapter') || localStorage.getItem('selectedChapterTitle') || 'Unknown Chapter';
+    const timeTaken = localStorage.getItem('timeTaken') || '0';
+    const correct = localStorage.getItem('correctAnswers') || localStorage.getItem('correctCount') || '0';
+    const wrong = localStorage.getItem('wrongAnswers') || localStorage.getItem('wrongCount') || '0';
 
     document.getElementById('playerName').textContent = playerName;
-    document.getElementById('chapterPlayed').textContent = chapter;
-    document.getElementById('timeTaken').textContent = time;
-    document.getElementById('score').textContent = correct;
-    document.getElementById('wrong').textContent = wrong;
+    document.getElementById('chapterTitle').textContent = chapterTitle;
+    document.getElementById('timeTaken').textContent = timeTaken;
+    document.getElementById('correctAnswers').textContent = correct;
+    document.getElementById('wrongAnswers').textContent = wrong;
 
-    // WhatsApp share link
-    const message = `I just completed "${chapter}" in Server Room Lockdown! ✅ Score: ${correct} / ❌ ${wrong} in ⏱️ ${time}s`;
-    const shareURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    document.getElementById('whatsappShare').href = shareURL;
+    // ==== WhatsApp Share ====
+    const shareText = `🎮 ${playerName} just completed "${chapterTitle}" in Server Room Lockdown!\n✅ ${correct} correct | ❌ ${wrong} wrong | ⏱️ ${timeTaken}s\nPlay now: [YOUR_GAME_LINK]`;
+    document.getElementById('whatsappShare').href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
 
-    // Certificate download (basic implementation)
+    // ==== Certificate Download ====
     function downloadCertificate() {
-      const text = `
-        🎓 Certificate of Completion
-        This certifies that ${playerName}
-        completed "${chapter}"
-        Score: ${correct} correct, ${wrong} wrong
-        Time Taken: ${time}s
-      `;
-      const blob = new Blob([text], { type: "text/plain" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `${playerName}_certificate.txt`;
-      link.click();
+      const certWindow = window.open('', '_blank');
+      certWindow.document.write(`
+        <html>
+          <head><title>Certificate</title></head>
+          <body style="text-align:center; font-family:sans-serif;">
+            <h1>🎓 Certificate of Completion</h1>
+            <p>This certifies that</p>
+            <h2>${playerName}</h2>
+            <p>successfully completed</p>
+            <h3>${chapterTitle}</h3>
+            <p>Score: ${correct}/10</p>
+            <p>Time: ${timeTaken} seconds</p>
+            <p>Date: ${new Date().toLocaleDateString()}</p>
+          </body>
+        </html>
+      `);
+      certWindow.print();
     }
 
+    // ==== Return to Chapters ====
     function goToChapters() {
-      window.location.href = 'chapters.html';
+      window.location.href = "chapters.html";
     }
 
-    // Submit to Google Form leaderboard
-    const formURL = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse';
-    const formData = new FormData();
-    formData.append('entry.1234567890', playerName); // Name
-    formData.append('entry.2345678901', chapter);    // Chapter
-    formData.append('entry.3456789012', time);       // Time
-    formData.append('entry.4567890123', correct);    // Correct
-    formData.append('entry.5678901234', wrong);      // Wrong
+    // ==== Auto-submit to Google Form Leaderboard ====
+    function submitToLeaderboard() {
+      const formURL = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse';
 
-    fetch(formURL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: formData
-    });
+      const formData = new FormData();
+      formData.append('entry.YOUR_NAME_FIELD_ID', playerName);
+      formData.append('entry.YOUR_CHAPTER_FIELD_ID', chapterTitle);
+      formData.append('entry.YOUR_TIME_FIELD_ID', timeTaken);
+      formData.append('entry.YOUR_SCORE_FIELD_ID', correct);
+      formData.append('entry.YOUR_WRONG_FIELD_ID', wrong);
+
+      fetch(formURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: formData
+      });
+    }
+
+    // Auto-run leaderboard submission
+    submitToLeaderboard();
   </script>
 </body>
 </html>
