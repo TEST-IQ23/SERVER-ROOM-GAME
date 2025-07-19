@@ -5,107 +5,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Server Room Lockdown - Questions</title>
   <link rel="stylesheet" href="style.css" />
+  <script defer src="questions.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h2 id="chapterTitle"></h2>
-    <p><strong>Player:</strong> <span id="playerName"></span></p>
-    <p><strong>Time Left:</strong> <span id="timer">30</span> seconds</p>
+  <div class="container question-page">
+    <h1 id="chapterTitle">Chapter</h1>
+    <div id="timer">Time Left: 30s</div>
 
-    <div id="questionBlock" class="question-block"></div>
-    <p id="feedback"></p>
+    <div id="questionContainer" class="question-block">
+      <!-- Question will be injected here -->
+    </div>
+
+    <div id="feedback"></div>
   </div>
 
-  <script src="questions.js"></script>
   <script>
-    const playerName = localStorage.getItem("playerName") || "Player";
-    const chapterId = parseInt(localStorage.getItem("selectedChapter"));
-    const chapterTitle = localStorage.getItem("selectedChapterTitle") || "Chapter";
+    const chapterId = localStorage.getItem('selectedChapterId');
+    const chapterTitle = localStorage.getItem('selectedChapterTitle');
+    document.getElementById('chapterTitle').textContent = `Chapter: ${chapterTitle}`;
 
-    document.getElementById("playerName").textContent = playerName;
-    document.getElementById("chapterTitle").textContent = chapterTitle;
-
-    const questions = questionsData[chapterId] || [];
-    let currentQuestionIndex = 0;
-    let score = 0;
-    let wrong = 0;
+    const allQuestions = questions[chapterId];
+    let currentQuestion = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let startTime = Date.now();
     let timer;
-    let countdown = 30;
+
+    function showQuestion() {
+      const q = allQuestions[currentQuestion];
+      const container = document.getElementById('questionContainer');
+      const feedback = document.getElementById('feedback');
+      container.innerHTML = '';
+      feedback.textContent = '';
+
+      const questionEl = document.createElement('p');
+      questionEl.textContent = q.question;
+      container.appendChild(questionEl);
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.className = 'option-button';
+        btn.onclick = () => {
+          clearInterval(timer);
+          const isCorrect = opt === q.answer;
+          feedback.textContent = isCorrect ? '✅ Pass' : '❌ Fail';
+          isCorrect ? correctCount++ : wrongCount++;
+          setTimeout(() => {
+            currentQuestion++;
+            if (currentQuestion < allQuestions.length) {
+              showQuestion();
+              startTimer();
+            } else {
+              endQuiz();
+            }
+          }, 1000);
+        };
+        container.appendChild(btn);
+      });
+    }
 
     function startTimer() {
-      clearInterval(timer);
-      countdown = 30;
-      document.getElementById("timer").textContent = countdown;
+      let timeLeft = 30;
+      const timerDisplay = document.getElementById('timer');
+      timerDisplay.textContent = `Time Left: ${timeLeft}s`;
 
       timer = setInterval(() => {
-        countdown--;
-        document.getElementById("timer").textContent = countdown;
-        if (countdown <= 0) {
+        timeLeft--;
+        timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+        if (timeLeft <= 0) {
           clearInterval(timer);
-          showFeedback(false); // time's up = wrong
+          document.getElementById('feedback').textContent = '⏰ Time Up! Fail';
+          wrongCount++;
+          setTimeout(() => {
+            currentQuestion++;
+            if (currentQuestion < allQuestions.length) {
+              showQuestion();
+              startTimer();
+            } else {
+              endQuiz();
+            }
+          }, 1000);
         }
       }, 1000);
     }
 
-    function showQuestion() {
-      if (currentQuestionIndex >= questions.length) {
-        finishChapter();
-        return;
-      }
-
-      const q = questions[currentQuestionIndex];
-      const block = document.getElementById("questionBlock");
-      const feedback = document.getElementById("feedback");
-      feedback.textContent = "";
-
-      block.innerHTML = `
-        <p><strong>Question ${currentQuestionIndex + 1}:</strong> ${q.question}</p>
-        ${q.options.map((opt, index) => `
-          <label>
-            <input type="radio" name="option" value="${opt}" onclick="checkAnswer('${opt}')">
-            ${opt}
-          </label><br>
-        `).join('')}
-      `;
-
-      startTimer();
+    function endQuiz() {
+      const totalTime = Math.floor((Date.now() - startTime) / 1000);
+      localStorage.setItem('correctCount', correctCount);
+      localStorage.setItem('wrongCount', wrongCount);
+      localStorage.setItem('timeTaken', totalTime);
+      window.location.href = 'results.html';
     }
 
-    function checkAnswer(selected) {
-      clearInterval(timer);
-      const correct = questions[currentQuestionIndex].answer;
-      const passed = selected === correct;
-
-      if (passed) {
-        score++;
-        showFeedback(true);
-      } else {
-        wrong++;
-        showFeedback(false);
-      }
-    }
-
-    function showFeedback(passed) {
-      const feedback = document.getElementById("feedback");
-      feedback.textContent = passed ? "✅ Pass!" : "❌ Fail!";
-      feedback.style.color = passed ? "lightgreen" : "red";
-
-      setTimeout(() => {
-        currentQuestionIndex++;
-        showQuestion();
-      }, 1500);
-    }
-
-    function finishChapter() {
-      localStorage.setItem(`chapter_${chapterId}_played`, "true");
-      localStorage.setItem(`chapter_${chapterId}_score`, score);
-      localStorage.setItem(`chapter_${chapterId}_fail`, wrong);
-      localStorage.setItem(`chapter_${chapterId}_date`, new Date().toLocaleString());
-
-      window.location.href = "results.html";
-    }
-
+    // Begin quiz
     showQuestion();
+    startTimer();
   </script>
 </body>
 </html>
