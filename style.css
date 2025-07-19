@@ -1,88 +1,129 @@
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(#0d1117, #161b22);
-  color: #c9d1d9;
-  margin: 0;
-  padding: 20px;
-  text-align: center;
-}
+const questions = {
+  "chapter1": [
+    {
+      type: "mcq",
+      q: "What is the primary purpose of a server room?",
+      options: ["To host parties", "To store servers and networking equipment", "To teach programming", "To manufacture hardware"],
+      answer: "To store servers and networking equipment"
+    },
+    {
+      type: "mcq",
+      q: "Which of the following ensures uninterrupted power supply in a server room?",
+      options: ["Generator", "UPS", "Router", "Modem"],
+      answer: "UPS"
+    },
+    {
+      type: "mcq",
+      q: "Which protocol is commonly used to access servers remotely?",
+      options: ["HTTP", "FTP", "SSH", "SMTP"],
+      answer: "SSH"
+    },
+    {
+      type: "mcq",
+      q: "What component is crucial for cooling server rooms?",
+      options: ["Heater", "Vent", "Air conditioner", "Humidifier"],
+      answer: "Air conditioner"
+    },
+    {
+      type: "mcq",
+      q: "Which device connects multiple computers in a network?",
+      options: ["Switch", "CPU", "RAM", "Monitor"],
+      answer: "Switch"
+    },
+    {
+      type: "mcq",
+      q: "What does RAID stand for?",
+      options: ["Random Access Identification Drive", "Redundant Array of Independent Disks", "Read and Identify Data", "Random Array of Internal Disks"],
+      answer: "Redundant Array of Independent Disks"
+    },
+    {
+      type: "mcq",
+      q: "Which tool helps prevent unauthorized access to servers?",
+      options: ["Firewall", "Cooler", "Hard drive", "SSD"],
+      answer: "Firewall"
+    },
+    {
+      type: "mcq",
+      q: "Which of the following is a server operating system?",
+      options: ["Windows 10", "Ubuntu Server", "Android", "iOS"],
+      answer: "Ubuntu Server"
+    },
+    {
+      type: "mcq",
+      q: "Which command lists files in Linux?",
+      options: ["cd", "ls", "pwd", "sudo"],
+      answer: "ls"
+    },
+    {
+      type: "mcq",
+      q: "What cable type is most commonly used for networking?",
+      options: ["HDMI", "Ethernet", "USB", "VGA"],
+      answer: "Ethernet"
+    }
+  ],
 
-h1, h2 {
-  color: #58a6ff;
-}
+  "chapter2": [
+    {
+      type: "mcq",
+      q: "What does DNS stand for?",
+      options: ["Domain Name System", "Digital Network Service", "Download Network Server", "Data Number Stream"],
+      answer: "Domain Name System"
+    },
+    {
+      type: "mcq",
+      q: "What port number is used for HTTP?",
+      options: ["21", "25", "80", "443"],
+      answer: "80"
+    },
+    {
+      type: "mcq",
+      q: "Which device assigns IP addresses automatically?",
+      options: ["Modem", "Firewall", "DHCP Server", "Hub"],
+      answer: "DHCP Server"
+    },
+    {
+      type: "mcq",
+      q: "What does an IP address uniquely identify?",
+      options: ["A program", "A computer on a network", "A monitor", "A printer"],
+      answer: "A computer on a network"
+    },
+    {
+      type: "mcq",
+      q: "Which of the following is a private IP address?",
+      options: ["8.8.8.8", "192.168.0.1", "172.217.5.78", "1.1.1.1"],
+      answer: "192.168.0.1"
+    },
+    {
+      type: "mcq",
+      q: "Which layer of the OSI model deals with IP addressing?",
+      options: ["Application", "Transport", "Network", "Physical"],
+      answer: "Network"
+    },
+    {
+      type: "mcq",
+      q: "Which command is used to check network connectivity?",
+      options: ["ipconfig", "ping", "format", "mkdir"],
+      answer: "ping"
+    },
+    {
+      type: "mcq",
+      q: "Which IP protocol version is most widely used today?",
+      options: ["IPv1", "IPv3", "IPv4", "IPv6"],
+      answer: "IPv4"
+    },
+    {
+      type: "mcq",
+      q: "Which protocol is used for secure web communication?",
+      options: ["FTP", "HTTP", "HTTPS", "SMTP"],
+      answer: "HTTPS"
+    },
+    {
+      type: "mcq",
+      q: "What tool translates domain names into IP addresses?",
+      options: ["DNS", "DHCP", "Router", "ARP"],
+      answer: "DNS"
+    }
+  ]
 
-.chapter-button {
-  background-color: #21262d;
-  color: #c9d1d9;
-  border: 2px solid #30363d;
-  padding: 15px 25px;
-  margin: 10px;
-  cursor: pointer;
-  border-radius: 8px;
-  font-size: 16px;
-  width: 80%;
-  max-width: 500px;
-  transition: all 0.3s ease;
-}
-
-.chapter-button:hover {
-  background-color: #30363d;
-  border-color: #58a6ff;
-}
-
-.question-block {
-  background-color: #1e222a;
-  padding: 15px;
-  margin: 20px auto;
-  border-radius: 8px;
-  max-width: 700px;
-  color: #fff;
-  text-align: left;
-}
-
-.question-block p {
-  font-weight: bold;
-}
-
-input[type="radio"],
-input[type="text"] {
-  margin-top: 5px;
-}
-
-.navigation-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 30px;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.back-button,
-.next-button {
-  padding: 10px 20px;
-  font-size: 1rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.back-button {
-  background-color: #444c56;
-  color: #fff;
-}
-
-.next-button {
-  background-color: #238636;
-  color: white;
-}
-
-.next-button:hover {
-  background-color: #2ea043;
-}
-
-footer {
-  margin-top: 50px;
-  font-size: 0.9rem;
-  color: #8b949e;
-}
+  // Additional chapters can be added here following the same structure
+};
