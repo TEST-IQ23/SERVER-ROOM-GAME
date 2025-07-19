@@ -3,53 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Server Room Lockdown - Choose Chapter</title>
+  <title>Server Room Lockdown - Chapters</title>
   <link rel="stylesheet" href="style.css" />
+  <script defer src="chapters.js"></script>
+  <script defer src="script.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Choose a Chapter</h1>
-    <p id="playerNameDisplay"></p>
+  <div class="container chapter-page">
+    <h1 id="greeting">Welcome, Agent!</h1>
+    <p>Select a chapter below to begin your mission:</p>
 
-    <div id="chapterList" class="chapter-list"></div>
-
-    <button onclick="goBack()">⬅ Back to Start</button>
+    <div id="chaptersContainer" class="chapters-grid">
+      <!-- Chapters will be loaded here dynamically -->
+    </div>
   </div>
 
   <script>
-    const chapters = [
-      { id: 1, title: "Chapter 1: Power Surge" },
-      { id: 2, title: "Chapter 2: Firewall Frenzy" },
-      { id: 3, title: "Chapter 3: Protocol Puzzle" },
-      { id: 4, title: "Chapter 4: Backup Breakdown" },
-      { id: 5, title: "Chapter 5: Network Nexus" },
-      { id: 6, title: "Chapter 6: Cache Clash" },
-      { id: 7, title: "Chapter 7: Malware Maze" },
-      { id: 8, title: "Chapter 8: Encryption Escape" },
-      { id: 9, title: "Chapter 9: Data Drift" },
-      { id: 10, title: "Chapter 10: Root Access Race" },
-    ];
+    // Display player name from localStorage
+    const playerName = localStorage.getItem('playerName') || 'Agent';
+    document.getElementById('greeting').textContent = `Welcome, ${playerName}!`;
 
-    const playerName = localStorage.getItem("playerName");
-    document.getElementById("playerNameDisplay").textContent = `Welcome, ${playerName || 'Player'}!`;
-
-    const chapterList = document.getElementById("chapterList");
-
-    chapters.forEach(chapter => {
-      const button = document.createElement("button");
-      button.textContent = chapter.title;
-      button.classList.add("chapter-button");
-      button.onclick = () => {
-        localStorage.setItem("selectedChapter", chapter.id);
-        localStorage.setItem("selectedChapterTitle", chapter.title);
-        window.location.href = "questions.html";
-      };
-      chapterList.appendChild(button);
-    });
-
-    function goBack() {
-      window.location.href = "start.html";
+    // Load chapters from chapters.js
+    function loadChapters() {
+      const container = document.getElementById('chaptersContainer');
+      chapters.forEach((chapter, index) => {
+        const button = document.createElement('button');
+        button.className = 'chapter-button';
+        button.textContent = chapter.title;
+        button.onclick = () => {
+          localStorage.setItem('selectedChapterId', chapter.id);
+          localStorage.setItem('selectedChapterTitle', chapter.title);
+          window.location.href = 'question.html';
+        };
+        container.appendChild(button);
+      });
     }
+
+    loadChapters();
   </script>
 </body>
 </html>
