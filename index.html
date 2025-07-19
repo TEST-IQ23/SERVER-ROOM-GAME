@@ -3,77 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Server Room Lockdown</title>
+  <title>Server Room Lockdown - Start</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="lock-icon.png" type="image/png">
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@600&display=swap" rel="stylesheet"/>
-  <script src="https://kit.fontawesome.com/a2e0e6b15c.js" crossorigin="anonymous"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #0d1117;
-      color: #c9d1d9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 2.5em;
-      color: #58a6ff;
-    }
-
-    .intro-text {
-      max-width: 600px;
-      margin: 20px auto;
-      font-size: 1.2em;
-      line-height: 1.5;
-    }
-
-    .start-btn {
-      margin-top: 30px;
-      background-color: #2ea043;
-      border: none;
-      padding: 12px 25px;
-      font-size: 1em;
-      border-radius: 6px;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .start-btn:hover {
-      background-color: #238636;
-    }
-
-    .emoji-lock {
-      font-size: 2em;
-      margin-bottom: 10px;
-    }
-  </style>
 </head>
 <body>
+  <h1>🔐 Server Room Lockdown</h1>
+  <p>Welcome agent. Your mission begins now.</p>
+  <p>Select a chapter to begin your escape.</p>
 
-  <div class="emoji-lock">🔒</div>
-  <h1>Server Room Lockdown</h1>
+  <div id="chapter-list"></div>
 
-  <p class="intro-text">
-    A cyber breach has sealed the server room. Can you solve all 10 security challenges to escape?
-  </p>
+  <footer>
+    <p>Created for First-Year CS & IT Students 🚀</p>
+  </footer>
 
-  <button class="start-btn" onclick="startGame()">
-    <i class="fas fa-play"></i> Start Mission
-  </button>
-
+  <script src="chapters.js"></script>
   <script>
-    function startGame() {
-      window.location.href = "chapters.html"; // Make sure this file exists
-    }
+    const chapterList = document.getElementById("chapter-list");
+
+    chapters.forEach((chapter, index) => {
+      const btn = document.createElement("button");
+      btn.textContent = `${index + 1}. ${chapter.title}`;
+      btn.className = "chapter-button";
+      btn.onclick = () => {
+        localStorage.setItem("currentChapter", index);
+        window.location.href = "chapters.html";
+      };
+      chapterList.appendChild(btn);
+    });
   </script>
 </body>
 </html>
