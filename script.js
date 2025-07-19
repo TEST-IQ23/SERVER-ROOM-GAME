@@ -1,4 +1,4 @@
-// ========= Global State =========
+// ========== Global State ==========
 let playerName = localStorage.getItem("playerName") || "";
 let selectedChapter = JSON.parse(localStorage.getItem("selectedChapter")) || null;
 let currentQuestionIndex = 0;
@@ -7,7 +7,7 @@ let wrongCount = 0;
 let questionTimer;
 let startTime;
 
-// ========= Start Page =========
+// ========== Start Page ==========
 function startGame() {
   const nameInput = document.getElementById("playerNameInput");
   const name = nameInput.value.trim();
@@ -20,7 +20,7 @@ function startGame() {
   }
 }
 
-// ========= Load Chapters =========
+// ========== Load Chapters ==========
 function loadChapters() {
   const name = localStorage.getItem("playerName") || "Player";
   document.getElementById("welcomePlayer").textContent = `Welcome, ${name}!`;
@@ -39,7 +39,7 @@ function loadChapters() {
   });
 }
 
-// ========= Load Questions =========
+// ========== Load Questions ==========
 function loadQuestions() {
   selectedChapter = JSON.parse(localStorage.getItem("selectedChapter"));
   playerName = localStorage.getItem("playerName");
@@ -67,7 +67,7 @@ function showQuestion() {
     return;
   }
 
-  // Reset area
+  // Clear previous question
   questionArea.innerHTML = "";
   clearTimeout(questionTimer);
 
@@ -144,22 +144,23 @@ function nextQuestion() {
   showQuestion();
 }
 
-// ========= Finish and Results =========
+// ========== Finish and Results ==========
 function finishQuiz() {
   const timeTaken = Math.round((Date.now() - startTime) / 1000);
 
-  localStorage.setItem("result", JSON.stringify({
+  const result = {
     chapter: selectedChapter.title,
     correct: correctCount,
     wrong: wrongCount,
     time: timeTaken,
     name: playerName
-  }));
+  };
 
+  localStorage.setItem("result", JSON.stringify(result));
   window.location.href = "results.html";
 }
 
-// ========= Results Page =========
+// ========== Results Page ==========
 function showResults() {
   const result = JSON.parse(localStorage.getItem("result"));
 
@@ -177,7 +178,7 @@ function showResults() {
   submitToGoogleForm(result);
 }
 
-// ========= Google Form Leaderboard =========
+// ========== Google Form Leaderboard ==========
 function submitToGoogleForm(data) {
   const formURL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse";
 
@@ -195,7 +196,7 @@ function submitToGoogleForm(data) {
   });
 }
 
-// ========= Utility Buttons =========
+// ========== Utility Buttons ==========
 function goToChapters() {
   window.location.href = "chapters.html";
 }
