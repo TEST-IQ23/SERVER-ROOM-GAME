@@ -5,177 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Server Room Lockdown - Chapters</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <div class="container">
-    <h1 class="centered">🔐 Server Room Lockdown <span id="timer"></span></h1>
-
-    <div id="chapter-container" class="centered"></div>
-
-    <div id="success" class="hidden">
-      <h2 class="success">🎉 You Escaped!</h2>
-      <p>You’ve restored server access and secured the system. Well done, agent!</p>
-      <input type="text" id="playerName" placeholder="Enter your name for the certificate" />
-      <button onclick="generateCertificate()">Generate Certificate</button>
-      <div id="certificate" class="hidden"></div>
+  <div id="game-container">
+    <h1>📘 Choose a Chapter</h1>
+    <div id="chapter-list"></div>
+    <div id="question-container" style="display: none;"></div>
+    <div id="navigation-buttons" style="display: none;">
+      <button id="back-to-chapters">🔙 Back to Chapters</button>
     </div>
   </div>
 
-  <!-- Google Form for Leaderboard -->
-  <form id="leaderboardForm" action="https://docs.google.com/forms/d/e/1FAIpQLSe4EwuIPz9MRWBLtGwxFm-r9tt38uHa8R33UwMXnu-XQnZY2A/formResponse" method="POST" target="hidden_iframe" style="display:none">
-    <input name="entry.2060976916" id="formName" />
-    <input name="entry.225669406" id="formTime" />
-  </form>
-  <iframe name="hidden_iframe" style="display:none;"></iframe>
-
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="chapters.js"></script>
+  <script src="questions.js"></script>
   <script>
-    let currentChapterIndex = 0;
-    let startTime = Date.now();
-    const container = document.getElementById('chapter-container');
+    const chapterList = document.getElementById("chapter-list");
+    const questionContainer = document.getElementById("question-container");
+    const navigationButtons = document.getElementById("navigation-buttons");
 
-    function showChapter(index) {
-      container.innerHTML = '';
+    function renderChapters() {
+      chapterList.innerHTML = '';
+      chapters.forEach(chapter => {
+        const btn = document.createElement("button");
+        btn.textContent = chapter.title;
+        btn.className = "chapter-button";
+        btn.onclick = () => showQuestions(chapter.id);
+        chapterList.appendChild(btn);
+      });
+    }
 
-      if (index >= chapters.length) {
-        document.getElementById('success').classList.remove('hidden');
+    function showQuestions(chapterId) {
+      chapterList.style.display = "none";
+      questionContainer.innerHTML = '';
+      questionContainer.style.display = "block";
+      navigationButtons.style.display = "block";
+
+      const chapterQuestions = questions[chapterId] || [];
+      if (chapterQuestions.length === 0) {
+        questionContainer.innerHTML = "<p>No questions available for this chapter.</p>";
         return;
       }
 
-      const chapter = chapters[index];
-      const chapterDiv = document.createElement('div');
-      chapterDiv.className = 'chapter';
-      chapterDiv.innerHTML = `<h2>${chapter.title}</h2>`;
+      chapterQuestions.forEach((q, index) => {
+        const block = document.createElement("div");
+        block.className = "question-block";
 
-      chapter.questions.forEach((question, qIndex) => {
-        const questionBlock = document.createElement('div');
-        questionBlock.className = 'question-block';
+        const qText = document.createElement("p");
+        qText.textContent = `${index + 1}. ${q.q}`;
+        block.appendChild(qText);
 
-        questionBlock.innerHTML = `<p><strong>Q${qIndex + 1}:</strong> ${question.q}</p>`;
+        if (q.type === "MCQ") {
+          q.options.forEach(option => {
+            const label = document.createElement("label");
+            label.innerHTML = `
+              <input type="radio" name="question-${chapterId}-${index}" value="${option}">
+              ${option}
+            `;
+            block.appendChild(label);
+            block.appendChild(document.createElement("br"));
+          });
+        } else if (q.type === "text") {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.name = `question-${chapterId}-${index}`;
+          input.placeholder = "Your answer";
+          block.appendChild(input);
+        }
 
-        question.options.forEach((option) => {
-          const label = document.createElement('label');
-          const input = document.createElement('input');
-          input.type = 'radio';
-          input.name = `question_${index}_${qIndex}`;
-          input.value = option;
-
-          label.appendChild(input);
-          label.appendChild(document.createTextNode(option));
-          questionBlock.appendChild(label);
-          questionBlock.appendChild(document.createElement('br'));
-        });
-
-        const checkBtn = document.createElement('button');
-        checkBtn.textContent = 'Check Answer';
-        checkBtn.onclick = () => {
-          const selected = document.querySelector(`input[name="question_${index}_${qIndex}"]:checked`);
-          if (!selected) {
-            alert('Please select an option');
-          } else if (selected.value === question.answer) {
-            alert('✅ Correct!');
-          } else {
-            alert('❌ Wrong answer!');
-          }
-        };
-        questionBlock.appendChild(checkBtn);
-        chapterDiv.appendChild(questionBlock);
-      });
-
-      // Navigation Buttons
-      const navDiv = document.createElement('div');
-      navDiv.style.marginTop = '20px';
-
-      if (index > 0) {
-        const backBtn = document.createElement('button');
-        backBtn.textContent = '⬅ Back';
-        backBtn.onclick = () => showChapter(index - 1);
-        navDiv.appendChild(backBtn);
-      }
-
-      if (index < chapters.length - 1) {
-        const nextBtn = document.createElement('button');
-        nextBtn.textContent = 'Next ➡';
-        nextBtn.onclick = () => showChapter(index + 1);
-        navDiv.appendChild(nextBtn);
-      } else {
-        const finishBtn = document.createElement('button');
-        finishBtn.textContent = '🏁 Finish';
-        finishBtn.onclick = () => showChapter(chapters.length);
-        navDiv.appendChild(finishBtn);
-      }
-
-      chapterDiv.appendChild(navDiv);
-      container.appendChild(chapterDiv);
-    }
-
-    function updateTimer() {
-      const now = Date.now();
-      const elapsed = Math.floor((now - startTime) / 1000);
-      const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
-      const secs = (elapsed % 60).toString().padStart(2, '0');
-      document.getElementById('timer').textContent = `${mins}:${secs}`;
-    }
-    setInterval(updateTimer, 1000);
-
-    function generateCertificate() {
-      const name = document.getElementById('playerName').value.trim();
-      if (!name) return alert("Please enter your name");
-
-      const endTime = Date.now();
-      const elapsed = Math.floor((endTime - startTime) / 1000);
-      const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
-      const secs = (elapsed % 60).toString().padStart(2, '0');
-      const cert = document.getElementById('certificate');
-      cert.classList.remove('hidden');
-      cert.innerHTML = `
-        <h3>🎓 Certificate of Escape</h3>
-        <p>This certifies that <strong>${name}</strong> successfully completed the Server Room Lockdown game.</p>
-        <p>Time Taken: ${mins}:${secs}</p>
-        <canvas id="certCanvas" style="display:none;"></canvas>
-        <button onclick="saveAsImage()">🖼️ Download Certificate</button>
-        <button onclick="shareOnWhatsApp()">📤 Share via WhatsApp</button>
-        <button onclick="submitFeedback()">💬 Submit Feedback</button>
-      `;
-      submitToLeaderboard(`${mins}:${secs}`, name);
-    }
-
-    function saveAsImage() {
-      const cert = document.getElementById("certificate");
-      html2canvas(cert).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'certificate.png';
-        link.href = canvas.toDataURL();
-        link.click();
+        questionContainer.appendChild(block);
       });
     }
 
-    function shareOnWhatsApp() {
-      const name = document.getElementById('playerName').value.trim();
-      const time = document.getElementById('timer').textContent;
-      const message = `🎓 I escaped the Server Room Lockdown!\nName: ${name}\nTime: ${time}\nPlay it here: https://test-iq23.github.io/SERVER-ROOM-GAME/`;
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-    }
+    document.getElementById("back-to-chapters").onclick = () => {
+      questionContainer.style.display = "none";
+      navigationButtons.style.display = "none";
+      chapterList.style.display = "block";
+    };
 
-    function submitFeedback() {
-      window.open("https://docs.google.com/forms/d/e/1FAIpQLSdu_fdi2qxup0D28h-bQXbrcpJJzm4AXZP9ByM57p9UXA06GQ/viewform", "_blank");
-    }
-
-    function submitToLeaderboard(time, name) {
-      document.getElementById("formName").value = name;
-      document.getElementById("formTime").value = time;
-      document.getElementById("leaderboardForm").submit();
-    }
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js').catch(console.error);
-    }
-
-    // Load first chapter
-    showChapter(0);
+    renderChapters();
   </script>
 </body>
 </html>
