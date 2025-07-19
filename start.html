@@ -2,20 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Server Room Lockdown</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Server Room Lockdown - Start</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: linear-gradient(#0d1117, #161b22);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .start-container {
+      background-color: #1e222a;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    h1 {
+      color: #58a6ff;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 90%;
+      max-width: 300px;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #238636;
+      color: white;
+      padding: 12px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #2ea043;
+    }
+
+    .warning {
+      color: red;
+      font-size: 14px;
+      display: none;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🔒 Server Room Lockdown</h1>
-    <p>A cyber breach has sealed the server room. Can you solve all security challenges to escape?</p>
-    <button onclick="startGame()">🚀 Start Mission</button>
+  <div class="start-container">
+    <h1>🚨 Server Room Lockdown 🚨</h1>
+    <p>You are locked inside a high-security server room. To escape, you must solve all chapter puzzles correctly. Start by entering your name:</p>
+    
+    <input type="text" id="playerName" placeholder="Enter your name..." />
+    <br />
+    <button onclick="startMission()">Start Mission</button>
+    <div class="warning" id="warning">Please enter your name to begin!</div>
   </div>
 
   <script>
-    function startGame() {
-      window.location.href = 'chapter.html';
+    function startMission() {
+      const name = document.getElementById("playerName").value.trim();
+      const warning = document.getElementById("warning");
+
+      if (name === "") {
+        warning.style.display = "block";
+      } else {
+        localStorage.setItem("playerName", name);
+        warning.style.display = "none";
+        window.location.href = "chapters.html";
+      }
     }
   </script>
 </body>
