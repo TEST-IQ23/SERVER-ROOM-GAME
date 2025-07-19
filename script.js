@@ -67,7 +67,6 @@ function showQuestion() {
     return;
   }
 
-  // Clear previous question
   questionArea.innerHTML = "";
   clearTimeout(questionTimer);
 
@@ -175,25 +174,29 @@ function showResults() {
   document.getElementById("resultScore").textContent = `✅ Correct: ${result.correct} | ❌ Wrong: ${result.wrong}`;
 
   // Submit to leaderboard
-  submitToGoogleForm(result);
+  const scoreText = `✅ ${result.correct} | ❌ ${result.wrong}`;
+  const datePlayed = new Date().toLocaleDateString();
+  submitToLeaderboard(result.name, result.chapter, scoreText, datePlayed, `${result.time}s`);
 }
 
-// ========== Google Form Leaderboard ==========
-function submitToGoogleForm(data) {
-  const formURL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse";
+// ========== Google Form Leaderboard (Final Version) ==========
+function submitToLeaderboard(playerName, chapter, scoreText, datePlayed, timeTaken) {
+  const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSe4EwuIPz9MRWBLtGwxFm-r9tt38uHa8R33UwMXnu-XQnZY2A/formResponse";
 
   const formData = new FormData();
-  formData.append("entry.YOUR_NAME_ID", data.name);
-  formData.append("entry.YOUR_CHAPTER_ID", data.chapter);
-  formData.append("entry.YOUR_TIME_ID", data.time);
-  formData.append("entry.YOUR_CORRECT_ID", data.correct);
-  formData.append("entry.YOUR_WRONG_ID", data.wrong);
+  formData.append("entry.2060976916", playerName);
+  formData.append("entry.784134679", chapter);
+  formData.append("entry.222168494", scoreText);
+  formData.append("entry.1033246286", datePlayed);
+  formData.append("entry.225669406", timeTaken);
 
   fetch(formURL, {
     method: "POST",
     mode: "no-cors",
     body: formData
-  });
+  })
+    .then(() => console.log("Leaderboard submission sent"))
+    .catch((err) => console.error("Submission error:", err));
 }
 
 // ========== Utility Buttons ==========
