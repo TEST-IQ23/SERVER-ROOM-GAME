@@ -1,211 +1,217 @@
-// General utility to get and set localStorage
-function setItem(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-function getItem(key) {
-  const value = localStorage.getItem(key);
-  return value ? JSON.parse(value) : null;
+/* ===== Global Styles ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-// Redirect to chapters if name is set
-function checkPlayerName() {
-  const playerName = getItem("playerName");
-  if (!playerName) {
-    window.location.href = "start.html";
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(145deg, #0d1117, #161b22);
+  color: #f0f0f0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  width: 90%;
+  max-width: 800px;
+  margin: auto;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+h1, h2, h3 {
+  margin-bottom: 20px;
+  color: #58a6ff;
+}
+
+p {
+  margin-bottom: 15px;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+/* ===== Input Field ===== */
+input[type="text"] {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 80%;
+  max-width: 400px;
+  margin-bottom: 20px;
+}
+
+/* ===== Buttons ===== */
+button, .btn, .button {
+  background-color: #238636;
+  color: #fff;
+  padding: 12px 24px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 10px 5px;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+button:hover, .btn:hover, .button:hover {
+  background-color: #2ea043;
+}
+
+.secondary-btn {
+  background-color: #30363d;
+}
+
+.secondary-btn:hover {
+  background-color: #484f58;
+}
+
+/* ===== Chapter Buttons ===== */
+.chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.chapter-btn, .chapter-button {
+  background-color: #161b22;
+  color: #58a6ff;
+  border: 2px solid #58a6ff;
+  padding: 20px;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 100%;
+  margin: 12px 0;
+}
+
+.chapter-btn:hover, .chapter-button:hover {
+  background-color: #58a6ff;
+  color: #161b22;
+}
+
+/* ===== Question Layout ===== */
+.question-block, .question-box {
+  background-color: #1e222a;
+  padding: 20px;
+  margin: 30px auto;
+  border-radius: 8px;
+  max-width: 700px;
+  color: #fff;
+}
+
+.question-block p {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+input[type="radio"] {
+  margin-right: 10px;
+}
+
+.options {
+  text-align: left;
+  margin-top: 20px;
+}
+
+.option, .option-button {
+  display: block;
+  background-color: #30363d;
+  color: white;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.option-button:hover {
+  background-color: #484f58;
+}
+
+/* ===== Timer ===== */
+#timer, .timer {
+  font-size: 1.3rem;
+  font-weight: bold;
+  background-color: #21262d;
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin: 20px 0;
+  border: 2px solid #30363d;
+  color: #ffa657;
+}
+
+/* ===== Feedback ===== */
+#feedback, .feedback {
+  margin-top: 20px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: inherit;
+}
+
+.pass {
+  color: #3fb950;
+}
+
+.fail {
+  color: #f85149;
+}
+
+/* ===== Results Summary ===== */
+.result-summary, .results {
+  background-color: #1e222a;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 30px;
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.result-summary p {
+  margin-bottom: 10px;
+}
+
+/* ===== Certificate & Sharing Buttons ===== */
+.cert-buttons, .certificate, .whatsapp, .feedback-link {
+  margin-top: 30px;
+  display: block;
+  width: 100%;
+}
+
+.cert-buttons button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px 10px;
   }
-  return playerName;
-}
 
-// Page 1: Handle start.html
-function handleStartPage() {
-  const startBtn = document.getElementById("startBtn");
-  startBtn.addEventListener("click", () => {
-    const nameInput = document.getElementById("playerName").value.trim();
-    if (nameInput) {
-      setItem("playerName", nameInput);
-      window.location.href = "chapters.html";
-    } else {
-      alert("Please enter your name to start.");
-    }
-  });
-}
-
-// Page 2: Handle chapters.html
-function handleChaptersPage() {
-  const name = checkPlayerName();
-  document.getElementById("welcomeName").textContent = name;
-
-  fetch("chapters.js")
-    .then(res => res.text())
-    .then(data => {
-      eval(data); // Loads window.chapters
-      const list = document.getElementById("chapterList");
-      window.chapters.forEach(chapter => {
-        const btn = document.createElement("button");
-        btn.className = "chapter-button";
-        btn.textContent = chapter.title;
-        btn.addEventListener("click", () => {
-          setItem("currentChapter", chapter);
-          window.location.href = "question.html";
-        });
-        list.appendChild(btn);
-      });
-    });
-}
-
-// Page 3: Handle question.html
-let timer;
-let timeTaken = 0;
-
-function handleQuestionPage() {
-  const chapter = getItem("currentChapter");
-  const playerName = checkPlayerName();
-  if (!chapter) {
-    window.location.href = "chapters.html";
-    return;
+  .question-block {
+    padding: 15px;
   }
 
-  document.getElementById("chapterTitle").textContent = chapter.title;
-
-  fetch("questions.js")
-    .then(res => res.text())
-    .then(data => {
-      eval(data); // Loads window.questions
-      const questions = window.questions[chapter.id];
-      let index = 0;
-      let score = 0;
-
-      function showQuestion() {
-        if (index >= questions.length) {
-          clearInterval(timer);
-          const totalTime = `${timeTaken}s`;
-          setItem("result", {
-            chapter: chapter.title,
-            score,
-            total: questions.length,
-            time: totalTime,
-            player: playerName,
-            date: new Date().toLocaleDateString()
-          });
-          window.location.href = "results.html";
-          return;
-        }
-
-        const q = questions[index];
-        document.getElementById("questionText").textContent = q.question;
-        const optionsBox = document.getElementById("optionsBox");
-        const feedback = document.getElementById("feedback");
-        optionsBox.innerHTML = "";
-        feedback.textContent = "";
-
-        q.options.forEach(option => {
-          const btn = document.createElement("button");
-          btn.className = "option-button";
-          btn.textContent = option;
-          btn.addEventListener("click", () => {
-            const correct = option === q.answer;
-            feedback.textContent = correct ? "✅ Pass" : "❌ Fail";
-            if (correct) score++;
-            index++;
-            setTimeout(showQuestion, 1000);
-          });
-          optionsBox.appendChild(btn);
-        });
-      }
-
-      let secondsLeft = 30;
-      const timerEl = document.getElementById("timer");
-      timerEl.textContent = `⏱️ ${secondsLeft}s`;
-
-      timer = setInterval(() => {
-        secondsLeft--;
-        timeTaken++;
-        timerEl.textContent = `⏱️ ${secondsLeft}s`;
-        if (secondsLeft <= 0) {
-          index++;
-          secondsLeft = 30;
-          showQuestion();
-        }
-      }, 1000);
-
-      showQuestion();
-    });
-}
-
-// Page 4: Handle results.html
-function handleResultsPage() {
-  const result = getItem("result");
-  if (!result) {
-    window.location.href = "chapters.html";
-    return;
+  button, .btn, .button, .chapter-btn, .chapter-button {
+    width: 100%;
+    font-size: 0.95rem;
   }
 
-  document.getElementById("summary").innerHTML = `
-    <p><strong>Chapter:</strong> ${result.chapter}</p>
-    <p><strong>Player:</strong> ${result.player}</p>
-    <p><strong>Score:</strong> ${result.score} / ${result.total}</p>
-    <p><strong>Time Taken:</strong> ${result.time}</p>
-    <p><strong>Date:</strong> ${result.date}</p>
-  `;
-
-  // Certificate link
-  document.getElementById("certificateBtn").addEventListener("click", () => {
-    alert("🎉 Certificate feature coming soon!");
-  });
-
-  // WhatsApp share
-  document.getElementById("whatsappBtn").addEventListener("click", () => {
-    const message = `I just played "${result.chapter}" on Server Room Lockdown!\nScore: ${result.score}/${result.total}\nTime: ${result.time}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
-  });
-
-  // Feedback
-  document.getElementById("feedbackBtn").addEventListener("click", () => {
-    window.open("https://docs.google.com/forms/d/e/1FAIpQLSdu_fdi2qxup0D28h-bQXbrcpJJzm4AXZP9ByM57p9UXA06GQ/viewform", "_blank");
-  });
-
-  // Return to chapters
-  document.getElementById("returnBtn").addEventListener("click", () => {
-    window.location.href = "chapters.html";
-  });
-
-  // Leaderboard submission
-  submitToLeaderboard(result);
-}
-
-// Google Form submission
-function submitToLeaderboard(data) {
-  const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSe4EwuIPz9MRWBLtGwxFm-r9tt38uHa8R33UwMXnu-XQnZY2A/formResponse';
-
-  const formData = new FormData();
-  formData.append('entry.2060976916', data.player); // Player Name
-  formData.append('entry.784134679', data.chapter); // Chapter
-  formData.append('entry.222168494', `${data.score}/${data.total}`); // Score
-  formData.append('entry.1033246286', data.date); // Date
-  formData.append('entry.225669406', data.time); // Time Taken
-
-  fetch(formUrl, {
-    method: 'POST',
-    mode: 'no-cors',
-    body: formData
-  });
-}
-
-// Routing logic for loading per page
-document.addEventListener("DOMContentLoaded", () => {
-  const page = document.body.getAttribute("data-page");
-  switch (page) {
-    case "start":
-      handleStartPage();
-      break;
-    case "chapters":
-      handleChaptersPage();
-      break;
-    case "question":
-      handleQuestionPage();
-      break;
-    case "results":
-      handleResultsPage();
-      break;
+  input[type="text"] {
+    width: 100%;
   }
-});
+}
