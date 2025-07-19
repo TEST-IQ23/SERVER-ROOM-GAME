@@ -1,74 +1,35 @@
-/* General Body Styling */
 body {
-  margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to bottom, #0d1117, #161b22);
-  color: #fff;
+  background: linear-gradient(#0d1117, #161b22);
+  color: #c9d1d9;
+  margin: 0;
+  padding: 20px;
   text-align: center;
 }
 
-/* Header Title */
-h1 {
-  font-size: 2.5em;
+h1, h2 {
   color: #58a6ff;
-  margin-top: 40px;
 }
 
-/* Mission Start Button */
-button.start-btn {
-  background-color: #2ea043;
-  color: white;
-  font-size: 16px;
-  padding: 12px 25px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 25px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-button.start-btn:hover {
-  background-color: #238636;
-}
-
-/* Intro Paragraph */
-.intro {
-  max-width: 600px;
-  margin: 20px auto;
-  background-color: #1e222a;
-  padding: 15px;
-  border-radius: 8px;
-  color: #ccc;
-}
-
-/* Chapter Grid Buttons */
 .chapter-button {
-  background-color: #2ea043;
-  color: white;
-  font-weight: bold;
-  padding: 15px 20px;
+  background-color: #21262d;
+  color: #c9d1d9;
+  border: 2px solid #30363d;
+  padding: 15px 25px;
   margin: 10px;
-  border: none;
-  border-radius: 8px;
-  width: 250px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  border-radius: 8px;
+  font-size: 16px;
+  width: 80%;
+  max-width: 500px;
+  transition: all 0.3s ease;
 }
 
 .chapter-button:hover {
-  background-color: #238636;
+  background-color: #30363d;
+  border-color: #58a6ff;
 }
 
-.chapter-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 30px;
-}
-
-/* Question Block Styling (from previous updates) */
 .question-block {
   background-color: #1e222a;
   padding: 15px;
@@ -76,6 +37,7 @@ button.start-btn:hover {
   border-radius: 8px;
   max-width: 700px;
   color: #fff;
+  text-align: left;
 }
 
 .question-block p {
@@ -85,4 +47,42 @@ button.start-btn:hover {
 input[type="radio"],
 input[type="text"] {
   margin-top: 5px;
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.back-button,
+.next-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.back-button {
+  background-color: #444c56;
+  color: #fff;
+}
+
+.next-button {
+  background-color: #238636;
+  color: white;
+}
+
+.next-button:hover {
+  background-color: #2ea043;
+}
+
+footer {
+  margin-top: 50px;
+  font-size: 0.9rem;
+  color: #8b949e;
 }
