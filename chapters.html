@@ -12,13 +12,11 @@
   <div class="container">
     <h1 id="greeting">Welcome, Agent!</h1>
     <p>Select a chapter below to begin your mission:</p>
-    <div id="chaptersContainer" class="chapter-grid">
-      <!-- Chapters will be injected here -->
-    </div>
+    <div id="chaptersContainer" class="chapter-grid"></div>
   </div>
 
   <script>
-    // Display player name from localStorage
+    // Set player name from localStorage
     const playerName = localStorage.getItem('playerName') || 'Agent';
     document.getElementById('greeting').textContent = `Welcome, ${playerName}!`;
 
