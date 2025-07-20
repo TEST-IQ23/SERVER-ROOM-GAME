@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chapter Questions – Server Room Lockdown</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="questions.js" defer></script>
 </head>
 <body class="question-page">
   <div class="container">
@@ -23,6 +22,11 @@
     </main>
   </div>
 
+  <!-- External Scripts -->
+  <script src="questions.js"></script>
+  <script src="script.js"></script>
+
+  <!-- Inline Logic (for standalone use without full script.js split) -->
   <script>
     const chapterId = localStorage.getItem('selectedChapterId');
     const chapterTitle = localStorage.getItem('selectedChapterTitle');
