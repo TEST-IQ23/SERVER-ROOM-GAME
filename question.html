@@ -26,13 +26,22 @@
   <script src="questions.js"></script>
   <script src="script.js"></script>
 
-  <!-- Inline Logic (for standalone use without full script.js split) -->
+  <!-- Inline Game Logic -->
   <script>
     const chapterId = localStorage.getItem('selectedChapterId');
     const chapterTitle = localStorage.getItem('selectedChapterTitle');
+
+    if (!chapterId || !questions[chapterId]) {
+      alert("⚠️ No chapter selected or questions not found. Redirecting...");
+      window.location.href = 'chapters.html';
+    }
+
     document.getElementById('chapterTitle').textContent = `Chapter: ${chapterTitle}`;
 
     const allQuestions = questions[chapterId];
+    console.log("Loaded Chapter ID:", chapterId);
+    console.log("Loaded Questions:", allQuestions);
+
     let currentQuestion = 0;
     let correctCount = 0;
     let wrongCount = 0;
@@ -47,7 +56,6 @@
 
       questionEl.textContent = q.question;
       optionsEl.innerHTML = '';
-      feedback.textContent = '';
       feedback.style.display = 'none';
 
       q.options.forEach((opt) => {
@@ -60,6 +68,7 @@
           feedback.textContent = isCorrect ? '✅ Pass' : '❌ Fail';
           feedback.style.display = 'block';
           isCorrect ? correctCount++ : wrongCount++;
+
           setTimeout(() => {
             currentQuestion++;
             if (currentQuestion < allQuestions.length) {
@@ -87,6 +96,7 @@
           document.getElementById('feedback').textContent = '⏰ Time Up! Fail';
           document.getElementById('feedback').style.display = 'block';
           wrongCount++;
+
           setTimeout(() => {
             currentQuestion++;
             if (currentQuestion < allQuestions.length) {
@@ -108,7 +118,7 @@
       window.location.href = 'results.html';
     }
 
-    // Start the quiz
+    // Start quiz
     showQuestion();
     startTimer();
   </script>
