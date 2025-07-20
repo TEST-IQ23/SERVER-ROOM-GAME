@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mission Questions – Server Room Lockdown</title>
+  <title>Chapter Questions – Server Room Lockdown</title>
   <link rel="stylesheet" href="style.css" />
   <script src="questions.js" defer></script>
 </head>
@@ -19,7 +19,7 @@
         <p id="questionText" class="question-text">Loading question...</p>
         <div id="options" class="options-grid"></div>
       </div>
-      <div id="feedback" class="feedback"></div>
+      <div id="feedback" class="feedback" style="display: none;"></div>
     </main>
   </div>
 
@@ -44,6 +44,7 @@
       questionEl.textContent = q.question;
       optionsEl.innerHTML = '';
       feedback.textContent = '';
+      feedback.style.display = 'none';
 
       q.options.forEach((opt) => {
         const btn = document.createElement('button');
@@ -53,6 +54,7 @@
           clearInterval(timer);
           const isCorrect = opt === q.answer;
           feedback.textContent = isCorrect ? '✅ Pass' : '❌ Fail';
+          feedback.style.display = 'block';
           isCorrect ? correctCount++ : wrongCount++;
           setTimeout(() => {
             currentQuestion++;
@@ -79,6 +81,7 @@
         if (timeLeft <= 0) {
           clearInterval(timer);
           document.getElementById('feedback').textContent = '⏰ Time Up! Fail';
+          document.getElementById('feedback').style.display = 'block';
           wrongCount++;
           setTimeout(() => {
             currentQuestion++;
