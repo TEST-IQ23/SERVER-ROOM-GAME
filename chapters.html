@@ -3,14 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chapters - Server Room Lockdown</title>
-
-  <!-- Linked chapter data -->
+  <title>Chapters – Server Room Lockdown</title>
   <script src="chapters.js"></script>
 
-  <!-- Embedded CSS styles -->
   <style>
-    /* ===== Global Styles ===== */
     * {
       margin: 0;
       padding: 0;
@@ -18,7 +14,6 @@
     }
 
     body {
-      margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(145deg, #0d1117, #161b22);
       color: #f0f0f0;
@@ -35,56 +30,11 @@
       text-align: center;
     }
 
-    h1, h2, h3 {
+    h1, h2 {
       margin-bottom: 20px;
       color: #58a6ff;
     }
 
-    p {
-      margin-bottom: 15px;
-      line-height: 1.6;
-      font-size: 1.1rem;
-    }
-
-    /* ===== Input Field ===== */
-    input[type="text"] {
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      width: 80%;
-      max-width: 400px;
-      margin-bottom: 20px;
-    }
-
-    /* ===== Buttons ===== */
-    button, .btn, .button {
-      background-color: #238636;
-      color: #fff;
-      padding: 12px 24px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin: 10px 5px;
-      transition: background-color 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    button:hover, .btn:hover, .button:hover {
-      background-color: #2ea043;
-    }
-
-    .secondary-btn {
-      background-color: #30363d;
-    }
-
-    .secondary-btn:hover {
-      background-color: #484f58;
-    }
-
-    /* ===== Chapter Buttons ===== */
     .chapter-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -92,7 +42,7 @@
       margin-top: 30px;
     }
 
-    .chapter-btn, .chapter-button {
+    .chapter-button {
       background-color: #161b22;
       color: #58a6ff;
       border: 2px solid #58a6ff;
@@ -102,27 +52,21 @@
       cursor: pointer;
       transition: 0.3s;
       width: 100%;
-      margin: 12px 0;
     }
 
-    .chapter-btn:hover, .chapter-button:hover {
+    .chapter-button:hover {
       background-color: #58a6ff;
       color: #161b22;
     }
 
-    /* ===== Responsive Design ===== */
     @media (max-width: 600px) {
       .container {
         padding: 20px 10px;
       }
 
-      .chapter-btn, .chapter-button {
+      .chapter-button {
         width: 100%;
         font-size: 0.95rem;
-      }
-
-      input[type="text"] {
-        width: 100%;
       }
     }
   </style>
@@ -134,9 +78,8 @@
     <div id="chapter-list" class="chapter-grid"></div>
   </div>
 
-  <!-- Embedded JS: loadChapters function -->
   <script>
-    function loadChapters() { 
+    function loadChapters() {
       const container = document.getElementById("chapter-list");
       const playerName = localStorage.getItem("playerName");
       document.getElementById("player-name").textContent = playerName || "Player";
@@ -151,17 +94,16 @@
         button.className = "chapter-button";
         button.textContent = chapter.title;
         button.onclick = () => {
-          localStorage.setItem("currentChapter", chapter.id);
+          // ✅ Store required data for question.html
+          localStorage.setItem("selectedChapterId", chapter.id);
+          localStorage.setItem("selectedChapterTitle", chapter.title);
           window.location.href = "question.html";
         };
         container.appendChild(button);
       });
     }
 
-    // Trigger only if on chapters.html
-    if (window.location.pathname.includes("chapters.html")) {
-      window.onload = loadChapters;
-    }
+    window.onload = loadChapters;
   </script>
 </body>
 </html>
