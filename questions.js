@@ -1,4 +1,4 @@
-const questionData = {
+const question = {
   1: [
     {
       type: "MCQ",
