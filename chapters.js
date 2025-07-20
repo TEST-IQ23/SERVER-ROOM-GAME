@@ -1,4 +1,5 @@
 // chapters.js
+
 window.chapters = [
   { id: 1, title: "Chapter 1: Introduction to Computer Systems" },
   { id: 2, title: "Chapter 2: Operating Systems" },
