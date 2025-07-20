@@ -3,40 +3,165 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Select Chapter – Server Room Lockdown</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="chapters.js" defer></script>
-  <script src="script.js" defer></script>
+  <title>Chapters - Server Room Lockdown</title>
+
+  <!-- Linked chapter data -->
+  <script src="chapters.js"></script>
+
+  <!-- Embedded CSS styles -->
+  <style>
+    /* ===== Global Styles ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(145deg, #0d1117, #161b22);
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 800px;
+      margin: auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    h1, h2, h3 {
+      margin-bottom: 20px;
+      color: #58a6ff;
+    }
+
+    p {
+      margin-bottom: 15px;
+      line-height: 1.6;
+      font-size: 1.1rem;
+    }
+
+    /* ===== Input Field ===== */
+    input[type="text"] {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 80%;
+      max-width: 400px;
+      margin-bottom: 20px;
+    }
+
+    /* ===== Buttons ===== */
+    button, .btn, .button {
+      background-color: #238636;
+      color: #fff;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 10px 5px;
+      transition: background-color 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    button:hover, .btn:hover, .button:hover {
+      background-color: #2ea043;
+    }
+
+    .secondary-btn {
+      background-color: #30363d;
+    }
+
+    .secondary-btn:hover {
+      background-color: #484f58;
+    }
+
+    /* ===== Chapter Buttons ===== */
+    .chapter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .chapter-btn, .chapter-button {
+      background-color: #161b22;
+      color: #58a6ff;
+      border: 2px solid #58a6ff;
+      padding: 20px;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+      width: 100%;
+      margin: 12px 0;
+    }
+
+    .chapter-btn:hover, .chapter-button:hover {
+      background-color: #58a6ff;
+      color: #161b22;
+    }
+
+    /* ===== Responsive Design ===== */
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px 10px;
+      }
+
+      .chapter-btn, .chapter-button {
+        width: 100%;
+        font-size: 0.95rem;
+      }
+
+      input[type="text"] {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
-<body class="chapters-page">
+<body>
   <div class="container">
-    <h1 id="greeting">Welcome, Agent!</h1>
-    <p>Select a chapter below to begin your mission:</p>
-    <div id="chaptersContainer" class="chapter-grid"></div>
+    <h1>Welcome, <span id="player-name">Player</span></h1>
+    <h2>Select a Chapter to Begin</h2>
+    <div id="chapter-list" class="chapter-grid"></div>
   </div>
 
+  <!-- Embedded JS: loadChapters function -->
   <script>
-    // Set player name from localStorage
-    const playerName = localStorage.getItem('playerName') || 'Agent';
-    document.getElementById('greeting').textContent = `Welcome, ${playerName}!`;
+    function loadChapters() { 
+      const container = document.getElementById("chapter-list");
+      const playerName = localStorage.getItem("playerName");
+      document.getElementById("player-name").textContent = playerName || "Player";
 
-    // Load chapters dynamically from chapters.js
-    function loadChapters() {
-      const container = document.getElementById('chaptersContainer');
-      chapters.forEach((chapter) => {
-        const button = document.createElement('button');
-        button.className = 'chapter-button';
+      if (!window.chapters || window.chapters.length === 0) {
+        container.innerHTML = "<p>No chapters available.</p>";
+        return;
+      }
+
+      window.chapters.forEach(chapter => {
+        const button = document.createElement("button");
+        button.className = "chapter-button";
         button.textContent = chapter.title;
         button.onclick = () => {
-          localStorage.setItem('selectedChapterId', chapter.id);
-          localStorage.setItem('selectedChapterTitle', chapter.title);
-          window.location.href = 'question.html';
+          localStorage.setItem("currentChapter", chapter.id);
+          window.location.href = "question.html";
         };
         container.appendChild(button);
       });
     }
 
-    loadChapters();
+    // Trigger only if on chapters.html
+    if (window.location.pathname.includes("chapters.html")) {
+      window.onload = loadChapters;
+    }
   </script>
 </body>
 </html>
